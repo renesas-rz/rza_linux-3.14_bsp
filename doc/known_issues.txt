@@ -1,0 +1,26 @@
+= Known issues
+
+    [U-Boot]
+        - When write data which is not 4 byte aligned to serial flash,
+          unexpected 1 to 3 byte data are written after the correct data to
+          align 4 byte.
+        - When read "4*n + 3" byte data, last 3 byte data are incorrect.
+
+    [Linux]
+        - [ADC]
+            The values captured by ADC are not correct because of the LSI's
+            known bug. This issue will be fixed by using LSI WS2.0(2nd-cut).
+        - [USB Host]
+            Following issues are occurred when use some specific USB
+            memories.
+              RUF-C256M/U2   :Error or hang up while kernel boots
+        - [DISPLAY(VDC5)]
+            If you use analog RGB connector(J15) as output device,
+            strong flicker occurs when it displays fine checkered pattern and
+            so on. This issue may be better by adjusting timing of video
+            signal. Please refer to users manual.
+        - [I2C]
+            When writing multiple bytes into EEPROM by eeprog,
+            a write error occurs.
+
+

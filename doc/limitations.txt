@@ -1,0 +1,187 @@
+= Limitations
+
+
+    --------------------------------------------------------------------
+    [U-Boot]
+        - Only USB boot and network boot are supported.
+        - QSPI flash driver supports only channel 0 and 1bit SDR transfer
+          mode.
+        - As for serial baud rate, only 115200bps is supported.
+        - Only 32M Bytes of Serial flash memory from 0x18000000 can be
+          accessible. (0x1A000000~ is mirror of  0x18000000~)
+        - NAND flash is not supported.
+
+
+    --------------------------------------------------------------------
+    [Kernel]
+        - Countermeasure for GIC errata No.801120 will be supported
+          after mainstream kernel supports it.
+        - Ch0 and ch1 of OSTM are used as kernel timer, user can't use them.
+
+    [NOR Flash]
+        - flash_lock and flash_unlock are not supported.
+
+    [QSPI Flash]
+        - flash_lock and flash_unlock are not supported.
+        - Multi-device connection per channel is not supported.
+        - Dual transfer mode of read is not supported.
+        - Dual/Quad transfer mode of program is not supported.
+        - DDR transfer mode is not supported.
+        - CH1(serial flash3) is not supported.
+
+    [RSPI]
+        - SPI_IOC_RD_LSB_FIRST ioctl is not supported.
+        - SPI_IOC_WR_LSB_FIRST ioctl is not supported.
+        - Operation tests have done under following conditions,
+            [Loop back mode]
+              channel 1, master mode,
+              8bit transfer bit length, MSB first.
+              burst transfer and DMA are not used.
+            [Audio Codec control]
+              channel 4, master mode,
+              8bit transfer bit length, MSB first.
+              burst transfer and DMA are not used.
+
+    [LPM(Low Power Mode)]
+        - Other commands except for poweroff are not supported.
+        - CPU goes into an infinite loop by poweroff.
+          So power consumption does not decreased.
+
+    [GPIO]
+        - "edge" attribute is not supported.
+        - Only following ports have tested because of the configuration
+          of the GENMAI board.
+            Output port (LED)(P4_10,P4_11)
+            Input port (DIPSW)(P0_0,P0_1,P7_0)
+        - When Linux boots, the following messages are shown, but
+          operation of GPIO is not influenced.
+           "sh_pfc gpio: Cant find gpio chip"
+
+    [USB Host]
+        - Supported device : USB memory device, mouse and keyboard.
+        - OTG is not supported.
+        - The cascade connection of USB hub is not supported.
+        - Hot swap of keyboard or mouse are not supported.
+
+    [USB Function]
+        - Only Gadget Serial Driver is supported.
+        - Only USB ch1(USB2 connector) is supported.
+
+    [ETHER]
+        - IEEE1588 is not supported.
+
+    [I2C]
+        - Slave mode is not supported.
+        - 10bit address is not supported.
+        - CH0, CH1, CH3 are not supported.
+
+    [SDHI]
+        - CPRM is not supported.
+        - UHS-I is not supported.
+        - Card detection(DAT3) is not supported.
+        - SD card password is not supported.
+        - SD(CH1) is not supported.
+        - When insert a SD card, the following messages might be shown,
+          but operation is not influenced.
+            "SD Status: Invalid Allocation Unit size."
+
+    [SDIO]
+        - Only SDIO WiFi card "SX-SDCAN" is tested.
+
+    [SERIAL]
+        - Supported baud rates are 300, 600, 1200, 2400, 4800, 9600,
+          19200, 38400, 57600, 115200.
+        - Clock synchronization mode is not supported.
+
+    [ADC]
+        - Only 12 bit resolution mode is supported.
+        - External trigger signal mode is not supported.
+        - CH1 of MTU2 is used as the timer trigger fixedly.
+        - Timer trigger cycle is fixed to 100ms.
+        - Following combinations of input ports are supported by timer
+          trigger mode.
+            AN0, AN1, AN2, AN3, AN0+AN1, AN0+AN1+AN2, AN0+AN1+AN2+AN3
+
+    [RTC]
+        - When Linux boots, the following messages are shown, but
+          operation of RTC is not influenced.
+          "sh-rtc sh-rtc: hctosys: unable to read the hardware clock"
+
+    [AUDIO]
+        - MIX function of SCUX is not supported.
+        - Supported audio data bit width : 16bit
+            (8/18/20/22/24/32bit are not supported.)
+        - Supported sampling rate of audio data :
+            11025/12000/16000/22050/24000/32000/44100/48000Hz
+            (8000/64000/88200/96000Hz are not supported.)
+        - Supported audio data channel : 2ch(L/R)
+            (1/3/4/5/6ch are not supported.)
+        - Supported output port : "Headphone output" of CPU board.
+        - Supported input port : "MIC input" of CPU board.
+        - Simultaneous operation of playback and recording is not supported.
+        - Recording buffer overrun causes data loss.
+        - Don't terminate by [CTRL+C] while playback or recording.
+          Kernel panic may be caused by [CTRL+C].
+
+    [DISPLAY (VDC5)]
+        - Output device can be selected from following option.
+          Default setting is CH0:LCD-KIT-B01, CH1:No output.
+            - VDC5 CH0
+                - No output
+                - LCD-KIT-B01       (J10 connector of option board)
+                - Analog RGB output (J15 connector of option board)
+            - VDC5 CH1
+                - No output
+                - LCD-KIT-B01       (J12 connector of option board)
+                - R0P7724EL0011RL   (J14 connector of option board)
+                - Analog RGB output (J16 connector of option board)
+
+        - Only the LCD-KIT-B01 connected to the J10 connector on the
+          option board is supported as the output device,
+        - Supported resolution is WXGA (800x480).
+        - Pixel format in the frame buffer is aRGB8888, but a (alpha)
+          is always 0xFF.
+        - Output format to the LCD-KIT-B01 is RGB666.
+        - The function either to change resolution or to adjust output
+          video signal timing is not supported.
+          So, when you use analog RGB output (J15 connector on the
+          option board), the screen may not be displayed correctly
+          even though you adjust the timing by the monitor.
+        - Touch panel of the LCD-KIT-B01 is not supported.
+        - When Linux boots, the following messages are shown, but
+          operation of DISPLAY is not influenced.
+          "(null): vdc5fb.1: channel 1 is turned off"
+
+        - In using the channel 1 of VDC5, there are the following
+          limitations.
+            - Jumper switch or DIP switch settings are needed to use CH1.
+              Please refer to uses manual of option board.
+            - Following device can't be used simultaneously because of some of
+              the signal lines are conflicted.
+            - Since some signal lines conflicts, the following interfaces or
+              devices cannot be used with VDC5 CH1.
+                - LAN interface (ETHER interface)
+                   SD card interface
+                   NOR flash memory2
+        - Touch panel is not supported.
+
+    [PWM]
+        - Use MTU2 CH4.
+        - PWM output port is P3_8.
+        - Can't be used with NAND Flash or MMC.
+        - Only tested using LCD Backlight Control I/F(/sys/class/backlight).
+        - When "period" and a "duty" preset value are made into a long cycle 
+          (ms order), the difference between a preset value and an output 
+          waveform becomes large. 
+          However, since the duty ratio (duty/period) which determines luminosity 
+          in the case of the brilliance control use of LCD Backlight becomes 
+          equivalent to the ratio of a preset value, it is satisfactory.
+
+    [UIO(JCU)]
+        - JPEG encoding is not supported.
+        - Supported output format is only ARGB8888(32bit)
+          (Alpha ch is fixed to 0xFF.)
+        - Maximum input data size : 50M Byte. (in case of JCU decode)
+
+
+

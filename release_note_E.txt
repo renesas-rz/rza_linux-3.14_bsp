@@ -1,0 +1,27 @@
+RZ/A1H Linux BSP Release Note
+
+=============================================================
+September 2014
+Renesas Electronics America Corporation
+
+= NOTIFICATION
+
+    This software is under the terms of GNU GPL/LGPL and other opensource
+    license. This software is provided with NO WARRANTY, to the extent
+    permitted by applicablelaw. The software is provided "as is" without
+    warranty of any kind, either expressed or implied, including the implied
+    warranties of merchantability or fitness for a particular purpose.
+    Renesas does not undertake any obligation to provide free of charge
+    service and/or Q&A support for this contents.
+
+
+= Contents of the package(Note: [ ] is directory)
+
+= Versions
+
+= Target board
+
+  CPU board         : RSKRZA1
+  Option board      : 
+
+

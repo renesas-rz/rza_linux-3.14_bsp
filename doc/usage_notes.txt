@@ -1,0 +1,15 @@
+= Notes
+
+    - Unmount block devices like SD, USB, MTD or use poweroff command
+      before power off or reset the board to avoid the data loss.
+    - With SD card adapter put in, do not take out or insert Micro SD
+      card or Mini SD card.
+    - Do not take out SD card before unmount it.
+    - JP11 needs to be changed from default setting "1-2" to
+      "non connect (not supply VBUSS power)" when use USB function.
+      If connect USB cable to PC without changing, PC might be broken because
+      of VBUS power from the board.
+    - Do not disconnect USB cable while USB function using.
+      Kernel panic may be caused by disconnect.
+
+
