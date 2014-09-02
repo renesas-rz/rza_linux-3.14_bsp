@@ -1,2 +1,25 @@
+        Board HW: PORT EXPANDER 1
+             Bus: I2C channel 3
+     Device Addr: 0x20
+Required package: i2c-tools
+    In Buildroot: Yes (menuconfig > Target packages > Hardware handling > i2c-tools)
+
+# i2cdetect -l
+i2c-0   i2c             i2c-riic.0                              I2C adapter
+i2c-1   i2c             i2c-riic.1                              I2C adapter
+i2c-2   i2c             i2c-riic.2                              I2C adapter
+i2c-3   i2c             i2c-riic.3                              I2C adapter
+
+** Read the Output Port Register (0x01) **
+# i2cget -y 3 0x20 0x01
+0xb7
+
+** Write to the Output Port Register (0x01) **
+** Blink all the LEDs on the board **
+# for i in $(seq 7 -1 0)
+> do
+> i2cset -y 3 0x20 0x01 0xb$i
+> sleep 1
+> done
 
 
