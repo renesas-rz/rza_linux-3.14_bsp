@@ -1,0 +1,40 @@
+        Board HW: Connected MOSI and MISO pins on CN15(1,3) together (loopback)
+             Bus: RSPI channel 4
+     Device Addr: chipselect 0
+Required package: linux-3.14/Documentation/spi/spidev_test.c
+    In Buildroot: No
+
+NOTES:
+The test file 'spidev_test.c' can be found in the Linux source tree and 
+easily builds with gcc.
+
+	$ arm-linux-gnueabihf-gcc -o spidev_test spidev_test.c 
+
+TESTS:
+
+$ spidev_test -O -D /dev/spidev4.0
+spi mode: 2
+bits per word: 8
+max speed: 500000 Hz (500 KHz)
+
+FF FF FF FF FF FF
+40 00 00 00 00 95
+FF FF FF FF FF FF
+FF FF FF FF FF FF
+FF FF FF FF FF FF
+DE AD BE EF BA AD
+F0 0D
+
+
+This matches what is in spidev_test.c file:
+	uint8_t tx[] = {
+		0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
+		0x40, 0x00, 0x00, 0x00, 0x00, 0x95,
+		0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
+		0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
+		0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF,
+		0xDE, 0xAD, 0xBE, 0xEF, 0xBA, 0xAD,
+		0xF0, 0x0D,
+	};
+
+

@@ -1,0 +1,12 @@
+        Board HW: USB connector
+             Bus: N/A
+     Device Addr: N/A
+Required package: N/A
+    In Buildroot: N/A
+
+NOTES:
+
+
+TESTS:
+Plugged in USB Flash drive and mounted it. Could read/write files.
+

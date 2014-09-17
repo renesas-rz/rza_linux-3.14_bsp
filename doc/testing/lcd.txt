@@ -1,0 +1,22 @@
+        Board HW: LCD Panel that comes with the RSK
+             Bus: VDC 0
+     Device Addr: N/A
+Required package: N/A
+    In Buildroot: N/A
+
+
+NOTES:
+Requires .config to have
+	CONFIG_FB=y
+	CONFIG_FRAMEBUFFER_CONSOLE=y
+
+Also, enabling "CONFIG_LOGO=y" adds the penguin image at the top during boot.
+
+TESTS:
+
+When booting the kernel, watch the boot log text that comes out the serial port get
+mirrored to the LCD screen. This is done by adding "115200 console=tty0" to the 
+bootargs. Example:
+	bootargs = 'console=ttySC2,115200 console=tty0'
+
+

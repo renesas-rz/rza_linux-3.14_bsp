@@ -4,6 +4,10 @@
 Required package: i2c-tools
     In Buildroot: Yes (menuconfig > Target packages > Hardware handling > i2c-tools)
 
+NOTES:
+
+TESTS:
+
 # i2cdetect -l
 i2c-0   i2c             i2c-riic.0                              I2C adapter
 i2c-1   i2c             i2c-riic.1                              I2C adapter
