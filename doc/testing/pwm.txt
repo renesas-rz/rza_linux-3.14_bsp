@@ -1,0 +1,79 @@
+NOTE: This driver is hard coded for only the TIOC4A pin (for the GENMAI board).
+The RSK Board does not have this hooked up to the LCD backlight signal.
+
+
+
+
+[The example of PWM Driver use]
+
+   [The example of a PWM waveform]
+          _____________         _____________         _____________        
+         |             |       |             |       |             |       
+   ______|             |_______|             |_______|             |_______
+   
+         |<--  duty -->|       |
+         |<----- period ------>|
+
+A PWM driver is controlled via LCD backlight control of sysfs(/sys/class/backlight).
+
+1.period and default duty setting
+
+   It specifies by the definition of the "pwm_backlight_data" structure in 
+   "board-rza1.c." 
+
+ static struct platform_pwm_backlight_data pwm_backlight_data = {
+     .max_brightness = 255,              <- backlight max brightness
+     .dft_brightness = 200,              <- backlight default brightness
+     .pwm_period_ns = 33333, /* 30kHz */ <- PWM period(ns)
+ };
+
+   Backlight "brightness" determines duty of PWM.
+
+     period = pwm_period_ns
+     duty = pwm_period_ns * dft_brightness / max_brightness
+
+   The resolution of PWM is 30 ns.
+
+   Please set up "pwm_period_ns" in the range for 60 ns(30ns * 2) to 125,827,200 ns
+   (30ns * 64 * 65535).
+
+   Please set up "pwm_period_ns" and "max_brightness" in the range of which the
+   following formula consists.
+
+     pwm_period_ns * max_brightness <= (unsigned int)0xFFFFFFFF
+
+   The setting range of "dft_brightness" is from "0" to "max_brightness".
+
+2.PWM duty is changed
+
+   duty of PWM can be changed by the following command.
+
+ # echo 128 > /sys/class/backlight/pwm-backlight.0/brightness
+
+     duty = pwm_period_ns * brightness / max_brightness
+
+   The setting range of "brightness" is from "0" to "max_brightness".
+   When "brightness" is "0", a PWM waveform is always a Low level.
+   When "brightness" is "max_brightness", a PWM waveform is always a High level.
+   
+   By issuing the above command, the PWM duty and waveform will be 
+   changed immediately without waiting for the end of the period.
+
+3.PWM Output Enable
+
+   The output of PWM is enabled by the following command.
+
+ # echo 0 > /sys/class/backlight/pwm-backlight.0/bl_power
+
+   PWM is output enable at the Kernel start-up.
+
+4.PWM Output Disable
+
+   The output of PWM is disabled by the following command.
+
+ # echo 1 > /sys/class/backlight/pwm-backlight.0/bl_power
+
+   By issuing the above command, the PWM waveform will be changed 
+   immediately without waiting for the end of the period.
+
+

@@ -1,0 +1,23 @@
+        Board HW: LCD
+             Bus: JCU (JPEG Engine)
+Required package: librzjpeg
+    In Buildroot: librzjpeg requries turbo-jpeg that can be built in Buildroot
+
+NOTES:
+
+TESTS:
+
+$ echo "create UIO device file"
+$ rm -f /dev/uio0
+$ mknod /dev/uio0 c $(cat /sys/class/uio/uio0/dev| sed -r "s/:/ /g")
+
+
+$ rzjpegtest -v tiger.jpg
+Input file   : tiger.jpg
+Jpeg info    : 800x480 image (4:2:0)
+format(byJCU): YCbCr420
+output info  : 800x480 (1/1)
+Decoded by   : JCU
+done!
+
+

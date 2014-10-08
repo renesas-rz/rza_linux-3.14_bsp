@@ -1,0 +1,156 @@
+Board HW: Potentiometer RV1
+     Bus: ADC Ch 7 (AN7)
+
+
+NOTES:
+Could have also used this open source package to test:
+	iioutils-0.2
+	http://sourceforge.net/projects/iioutils/
+
+TEST:
+
+<> Here are the availible sysfs interfaces:
+
+	$ ls -al /sys/bus/iio/devices/iio\:device0/
+	total 0
+	drwxr-xr-x    6 root     root             0 Jan  1 00:10 .
+	drwxr-xr-x    5 root     root             0 Jan  1 00:10 ..
+	drwxr-xr-x    2 root     root             0 Jan  1 00:12 buffer
+	-r--r--r--    1 root     root          4096 Jan  1 00:12 dev
+	-rw-r--r--    1 root     root          4096 Jan  1 00:10 in_voltage0_raw
+	-rw-r--r--    1 root     root          4096 Jan  1 00:10 in_voltage1_raw
+	-rw-r--r--    1 root     root          4096 Jan  1 00:10 in_voltage2_raw
+	-rw-r--r--    1 root     root          4096 Jan  1 00:10 in_voltage3_raw
+	-rw-r--r--    1 root     root          4096 Jan  1 00:12 in_voltage4_raw
+	-rw-r--r--    1 root     root          4096 Jan  1 00:12 in_voltage5_raw
+	-rw-r--r--    1 root     root          4096 Jan  1 00:12 in_voltage6_raw
+	-rw-r--r--    1 root     root          4096 Jan  1 00:12 in_voltage7_raw
+	-rw-r--r--    1 root     root          4096 Jan  1 00:12 in_voltage_sampling_frequency
+	-rw-r--r--    1 root     root          4096 Jan  1 00:12 in_voltage_scale
+	-r--r--r--    1 root     root          4096 Jan  1 00:12 name
+	drwxr-xr-x    2 root     root             0 Jan  1 00:12 power
+	drwxr-xr-x    2 root     root             0 Jan  1 00:12 scan_elements
+	lrwxrwxrwx    1 root     root             0 Jan  1 00:12 subsystem -> ../../../../bus/iio
+	drwxr-xr-x    2 root     root             0 Jan  1 00:12 trigger
+	-rw-r--r--    1 root     root          4096 Jan  1 00:12 uevent
+
+1. Software Trigger Mode (One Shot Mode)
+---------------------------------------------------------------
+
+AN0 = SW2
+	$ cat /sys/bus/iio/devices/iio:device0/in_voltage0_raw
+	2809
+
+AN7 = POT RV7 
+Read POT RV7 5 times (AN7), once per second while turning the pot
+	$ for i in 1 2 3 4 5
+	> do
+	> cat /sys/bus/iio/devices/iio:device0/in_voltage7_raw
+	> sleep 1
+	> done
+	0
+	131
+	452
+	699
+	998
+
+
+
+2.Timer Trigger Mode (AN0-3 Enable, Buffer Length 16 sample, timestamp Option Enable)
+
+# echo 1 > /sys/bus/iio/devices/iio:device0/scan_elements/in_voltage0_en
+# echo 1 > /sys/bus/iio/devices/iio:device0/scan_elements/in_voltage1_en
+# echo 1 > /sys/bus/iio/devices/iio:device0/scan_elements/in_voltage2_en
+# echo 1 > /sys/bus/iio/devices/iio:device0/scan_elements/in_voltage3_en
+# echo 16 > /sys/bus/iio/devices/iio:device0/buffer/length
+# echo 1 > /sys/bus/iio/devices/iio:device0/scan_elements/in_timestamp_en
+# echo 1 > /sys/bus/iio/devices/iio:device0/buffer/enable
+# sleep 5
+# echo 0 > /sys/bus/iio/devices/iio:device0/buffer/enable
+# dd if=/dev/iio:device0 |hexdump -C
+0+1 records in
+0+1 records out
+00000000  a1 07 42 08 c5 08 63 09  6c 1e 50 0c b8 01 00 00  |..B...c.l.P.....|
+00000010  fe 08 b3 09 85 0a 6e 0b  ac 77 c3 13 b8 01 00 00  |......n..w......|
+00000020  39 0a 1f 0b 1c 0c 38 0d  ec d0 36 1b b8 01 00 00  |9.....8...6.....|
+00000030  59 0b 68 0c 8c 0d a2 0e  2c 2a aa 22 b8 01 00 00  |Y.h.....,*."....|
+00000040  20 0c 3f 0d 5f 0e 52 0f  00 b9 94 2a b8 01 00 00  | .?._.R....*....|
+00000050  87 0c aa 0d bb 0e a0 0f  40 12 08 32 b8 01 00 00  |........@..2....|
+00000060  a3 0c c9 0d dd 0e b6 0f  80 6b 7b 39 b8 01 00 00  |.........k{9....|
+00000070  a1 0c c8 0d dc 0e b6 0f  c0 c4 ee 40 b8 01 00 00  |...........@....|
+00000080  a5 0c ca 0d dd 0e b8 0f  00 1e 62 48 b8 01 00 00  |..........bH....|
+00000090  a3 0c cb 0d e0 0e b8 0f  40 77 d5 4f b8 01 00 00  |........@w.O....|
+000000a0  a2 0c ca 0d e0 0e ba 0f  80 d0 48 57 b8 01 00 00  |..........HW....|
+000000b0  a1 0c c8 0d dc 0e b8 0f  c0 29 bc 5e b8 01 00 00  |.........).^....|
+000000c0  a1 0c c6 0d d9 0e b6 0f  00 83 2f 66 b8 01 00 00  |........../f....|
+000000d0  b5 0c da 0d e9 0e be 0f  40 dc a2 6d b8 01 00 00  |........@..m....|
+000000e0  a4 0c ca 0d dc 0e b6 0f  14 6b 8d 75 b8 01 00 00  |.........k.u....|
+000000f0  a1 0c c5 0d d5 0e b4 0f  54 c4 00 7d b8 01 00 00  |........T..}....|
+         | AN0 | AN1 | AN2 | AN3 || timestamp(timeofday ns)|
+
+
+3.Timer Trigger Mode (AN0-1 Enable, AN2-3 Disable, Buffer Length 16 sample, timestamp Option Disable)
+
+# echo 1 > /sys/bus/iio/devices/iio:device0/scan_elements/in_voltage0_en
+# echo 1 > /sys/bus/iio/devices/iio:device0/scan_elements/in_voltage1_en
+# echo 0 > /sys/bus/iio/devices/iio:device0/scan_elements/in_voltage2_en
+# echo 0 > /sys/bus/iio/devices/iio:device0/scan_elements/in_voltage3_en
+# echo 16 > /sys/bus/iio/devices/iio:device0/buffer/length
+# echo 0 > /sys/bus/iio/devices/iio:device0/scan_elements/in_timestamp_en
+# echo 1 > /sys/bus/iio/devices/iio:device0/buffer/enable
+# sleep 5
+# echo 0 > /sys/bus/iio/devices/iio:device0/buffer/enable
+# dd if=/dev/iio:device0 |hexdump -C
+00000000  29 08 b3 08 62 09 23 0a  97 0a 8c 0b 9c 0b b5 0c  |)...b.#.........|
+00000010  41 0c 56 0d 82 0c 9e 0d  9c 0c c3 0d a5 0c c8 0d  |A.V.............|
+00000020  a1 0c c8 0d a1 0c c8 0d  aa 0c ce 0d a3 0c cb 0d  |................|
+00000030  a8 0c cb 0d a1 0c c8 0d  a1 0c c3 0d c9 0c eb 0d  |................|
+
+
+3.Timer Trigger Mode (AN7 Enable, AN2-7 Disable, Buffer Length 16 sample, timestamp Option Disable)
+	scan the READ RV1 POT 
+$ for i in 0 1 2 3 4 5 6
+> do
+> echo 0 > /sys/bus/iio/devices/iio:device0/scan_elements/in_voltage${i}_en
+> done
+$ echo 1 > /sys/bus/iio/devices/iio:device0/scan_elements/in_voltage7_en
+$ echo 16 > /sys/bus/iio/devices/iio:device0/buffer/length
+$ echo 0 > /sys/bus/iio/devices/iio:device0/scan_elements/in_timestamp_en
+$ echo 1 > /sys/bus/iio/devices/iio:device0/buffer/enable
+# sleep 5
+$ echo 0 > /sys/bus/iio/devices/iio:device0/buffer/enable
+$ dd if=/dev/iio:device0 bs=16 count=1 | hexdump -dv
+
+# scan 8 times (POT not moving)
+$ echo 0 > /sys/bus/iio/devices/iio:device0/buffer/enable
+$ echo 1 > /sys/bus/iio/devices/iio:device0/buffer/enable
+$ echo 0 > /sys/bus/iio/devices/iio:device0/buffer/enable
+$ dd if=/dev/iio:device0 bs=16 count=1 | hexdump -dv
+1+0 records in
+1+0 records out
+0000000   01827   01827   01827   01827   01827   01828   01827   01827
+0000010
+
+# scan 64 (while turning POT)
+$ echo 0 > /sys/bus/iio/devices/iio:device0/buffer/enable
+$ echo 128 > /sys/bus/iio/devices/iio:device0/buffer/length
+$ echo 1 > /sys/bus/iio/devices/iio:device0/buffer/enable
+$ echo 0 > /sys/bus/iio/devices/iio:device0/buffer/enable
+$ dd if=/dev/iio:device0 | hexdump -dv
+0000000   00000   00000   00001   00000   00000   00000   00000   00092
+0000010   00164   00200   00273   00311   00388   00458   00507   00537
+0000020   00580   00621   00668   00723   00761   00855   00933   01046
+0000030   01283   01448   01506   01722   01783   01936   01971   02000
+0000040   02138   02164   02189   02218   02339   02365   02546   02582
+0000050   02627   02854   02872   03097   03153   03380   03473   03654
+0000060   03889   04095   04095   04095   04094   04095   04095   04095
+0000070   04095   04095   04095   04095   04095   04095   04095   04095
+0000080   04095   04095   04095   04095   04095   04095   04093   04095
+0000090   04095   04095   04095   04095   04095   04095   04095   04095
+00000a0   04095   04095   04095   04095   04095   04095   04095   04095
+00000b0   04095   04095   04095   04095   04095   04095   04095   04095
+
+
+
+
+

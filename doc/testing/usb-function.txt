@@ -1,0 +1,65 @@
+This uses the USB Ethernet gadget for testing.
+Therefor, make sure to set 
+	CONFIG_USB_ETH=y
+	CONFIG_USB_ETH_RNDIS=y
+in your kernel config.
+
+JP11 = Open
+
+bootargs: add "usbgs=0"  (selects gadget on USB0, host on USB1)
+
+
+$ g_ether gadget: high-speed config #1: CDC Ethernet (ECM)
+
+$ ifconfig -a
+eth0      Link encap:Ethernet  HWaddr 74:90:50:00:4E:36
+          inet addr:192.168.0.55  Bcast:192.168.0.255  Mask:255.255.255.0
+          inet6 addr: fe80::7690:50ff:fe00:4e36/64 Scope:Link
+          UP BROADCAST RUNNING MULTICAST  MTU:1500  Metric:1
+          RX packets:1829 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:1100 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:1000
+          RX bytes:1774465 (1.6 MiB)  TX bytes:171830 (167.8 KiB)
+          Interrupt:103 Base address:0x3000 DMA chan:ff
+
+lo        Link encap:Local Loopback
+          inet addr:127.0.0.1  Mask:255.0.0.0
+          inet6 addr: ::1/128 Scope:Host
+          UP LOOPBACK RUNNING  MTU:65536  Metric:1
+          RX packets:0 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:0 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0
+          RX bytes:0 (0.0 B)  TX bytes:0 (0.0 B)
+
+sit0      Link encap:IPv6-in-IPv4
+          NOARP  MTU:1480  Metric:1
+          RX packets:0 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:0 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:0
+          RX bytes:0 (0.0 B)  TX bytes:0 (0.0 B)
+
+usb0      Link encap:Ethernet  HWaddr AE:9B:D6:14:29:15
+          BROADCAST MULTICAST  MTU:1500  Metric:1
+          RX packets:0 errors:0 dropped:0 overruns:0 frame:0
+          TX packets:0 errors:0 dropped:0 overruns:0 carrier:0
+          collisions:0 txqueuelen:1000
+          RX bytes:0 (0.0 B)  TX bytes:0 (0.0 B)
+
+DEVICE:
+	$ ifconfig usb0 up
+	$ ifconfig usb0 192.168.0.69
+HOST: 
+	$ sudo ifconfig usb0 up
+	$ sudo ifconfig usb0 192.168.0.70
+	$ ping 192.168.0.69
+	PING 192.168.0.69 (192.168.0.69) 56(84) bytes of data.
+	64 bytes from 192.168.0.69: icmp_req=2 ttl=64 time=3.74 ms
+	64 bytes from 192.168.0.69: icmp_req=3 ttl=64 time=2.67 ms
+	64 bytes from 192.168.0.69: icmp_req=4 ttl=64 time=1.54 ms
+	64 bytes from 192.168.0.69: icmp_req=5 ttl=64 time=2.94 ms
+
+
+
+
+
+

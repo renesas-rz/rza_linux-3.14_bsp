@@ -1,0 +1,14 @@
+rx 100
+exec SetSkipProgOnCRCMatch=0
+
+//
+// Download application into QSPI flash
+//
+// Loads into both QSPIs
+//
+
+loadbin uImage.bin,0x18200000
+//verifybin uImage.bin,0x18200000
+
+
+exit

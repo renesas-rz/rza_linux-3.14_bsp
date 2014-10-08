@@ -1,0 +1,43 @@
+Setup MAC Address
+
+This is done in u-boot.
+
+Connect AC adapter and power on the CPU board.
+Push space key of the terminal as soon as possible after
+power on to stop autoboot.
+
+MAC Address is stored in eeprom(0x08000000 ~ 0x08000007).
+First two bytes are 0, and following 6 bytes as MAC Address.
+
+An example of eeprom writing procedure is as follows:
+
+(1) Write
+
+	Ex. MAC Address = 66:55:44:33:22:11
+	  * Use MAC address printed on the label on the board.
+
+	=> mm.b 0x08000000
+		First 2byte should be set 0.
+		ex) 08000000: XX ? 0
+		    08000001: XX ? 0
+		Set MAC Address.
+		and exit to push "." key.
+		ex) 08000002: XX ? 66
+		    08000003: XX ? 55
+		    08000004: XX ? 44
+		    08000005: XX ? 33
+		    08000006: XX ? 22
+		    08000007: XX ? 11
+		    08000008: XX ? .
+	=> md.b 0x08000000 8
+		ex)08000000: 00 00 66 55 44 33 22 11
+	=> eeprom write 0x08000000 0 8
+		ex)EEPROM @0x50 write: addr 08000000  off 0000  count 8 ... done
+
+(2) Check
+	=> eeprom read 0x08000000 0 8
+		ex)EEPROM @0x50 read: addr 08000000  off 0000  count 8 ... done
+	=> md.b 0x08000000 8
+		ex)08000000: 00 00 66 55 44 33 22 11
+
+

@@ -1,0 +1,36 @@
+
+
+$ cat /proc/mtd
+dev:    size   erasesize  name
+mtd0: 00080000 00020000 "u-boot"
+mtd1: 00040000 00020000 "u-boot_env"
+mtd2: 00040000 00020000 "dtb"
+mtd3: 00400000 00020000 "kernel"
+mtd4: 03b00000 00020000 "data"
+mtd5: 00800000 04000000 "rootfs"
+mtd6: 02000000 04000000 "rootfs-ext2"
+mtd7: 00080000 00040000 "spibsc0_loader"
+mtd8: 00040000 00040000 "spibsc0_bootenv"
+mtd9: 00400000 00040000 "spibsc0_kernel"
+mtd10: 03b40000 00040000 "spibsc0_rootfs
+
+
+$ dd if=rootfs.squashfs bs=80000 of=/dev/mtdblock4
+random: nonblocking pool is initialized
+202+1 records in
+202+1 records out
+
+
+$ dd if=rootfs.squashfs bs=80000 of=/dev/mtdblock4
+random: nonblocking pool is initialized
+202+1 records in
+202+1 records out
+$ mount /dev/mtdblock4 /mnt
+$ mount
+/dev/mtdblock4 on /mnt type squashfs (ro,relatime)
+
+$ ls /mnt
+bin      etc      lib      linuxrc  mnt      proc     run      sys      usr
+dev      home     lib32    media    opt      root     sbin     tmp      var
+
+

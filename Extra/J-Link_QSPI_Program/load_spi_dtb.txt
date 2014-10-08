@@ -1,0 +1,12 @@
+rx 100
+exec SetSkipProgOnCRCMatch=0
+
+//
+// Download application into QSPI flash
+//
+
+loadbin r7s72100-rskrza1.dtb.bin,0x180C0000
+//verifybin r7s72100-rskrza1.dtb.bin,0x180C0000
+
+
+exit

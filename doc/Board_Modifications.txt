@@ -1,0 +1,48 @@
+NOTE: On later RSK builds, these issues were resolved, so you may not have to do any modifications.
+
+================================================
+ENABLE ETHERNET
+================================================
+To use Ethernet, RSK+RZA1H board configuration must be changed  by modifying link registers.
+
+	R104 : Fit -> Remove
+	R105 : Remove -> Fit
+
+Please refer to [6.1.8 Ethernet] of "RZ/A1H Group Renesas Starter Kit+  User's Manual For DS-5" for details. 
+
+The two resistors are right on the corner of the RZ chip between the silk screen text for IC1 and a Tantalum capacitor next to silk screen marking for IC20. 
+
+They are located together – the only two resistors in this area.
+Please see "Ethernet_Resistors.png"
+
+  IC1    oo|
+         oo|
+         oo|
+ooooooooooo|
+ooooooooooo|
+------------
+            o
+
+        [R105]
+        [R104]
+
+         ---------
+        |tantalum |
+        |capacitor|
+         ---------
+
+
+================================================
+REMOVE SD CARD DATA LINE PULL DOWN
+================================================
+During board manufacturing, a 0-Ohm resistor was populated when it was not supposed to be.
+
+Resistor R92 Needs to be removed.
+
+It is located on the bottom of the board near the CN1 card socket.
+
+Please see "SD_Resistor_Remove.jpg"
+
+
+
+

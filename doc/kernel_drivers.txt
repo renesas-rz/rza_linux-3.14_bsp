@@ -1,0 +1,195 @@
+Below are the configuraiton symbols and  menuconfig locations for each kernel driver.
+
+---------------------------------------------------
+NOTE: You can search for any driver location from within menuconfig by pressing
+the '/' key and then entering the configuration symbol name.
+---------------------------------------------------
+
+
+AUDIO
+---------------------------------------------------
+CONFIG_SND_SCUX_RSKRZA1:
+> Device Drivers
+	> Sound card support
+		> Advanced Linux Sound Architecture
+			> ALSA for SoC audio support
+				> SoC Audio support for SuperH
+					[*] SCUX sound support on RSK-RZA1
+
+NOTE: You also need to enable:
+	CONFIG_SND_MIXER_OSS
+	CONFIG_SND_PCM_OSS
+	CONFIG_SND_PCM_OSS_PLUGINS
+
+      You do not need:
+	CONFIG_SND_SUPPORT_OLD_API
+	CONFIG_SND_DRIVERS
+
+
+USB Host
+---------------------------------------------------
+CONFIG_USB_R8A66597_HCD
+	> Device Drivers
+		> USB support
+			[*] R8A66597 HCD support 
+
+
+
+USB Function
+---------------------------------------------------
+CONFIG_USB_R8A66597
+> Device Drivers
+	> USB support
+		> USB Gadget Support
+			> USB Peripheral Controller
+				[*] Renesas R8A66597 USB Peripheral Controller
+
+
+DMA
+---------------------------------------------------
+CONFIG_RZA1_DMAE
+> Device Drivers
+	> DMA Engine support
+		[*] Renesas RZA1 DMAC support
+
+
+
+UIO (for JPEG Userspace app)
+---------------------------------------------------
+CONFIG_UIO_PDRV_GENIRQ
+> Device Drivers
+	> Userspace I/O drivers
+		[*] Userspace I/O platform driver with generic IRQ handling
+
+
+RTC
+---------------------------------------------------
+CONFIG_RTC_DRV_SH
+> Device Drivers
+	> Real Time Clock
+		[*] SuperH On-Chip RTC
+
+
+ADC
+---------------------------------------------------
+CONFIG_SH_ADC
+> Device Drivers
+	> Industrial I/O support
+		> Analog to digital converters
+			[*] RZA1 ADC support
+
+
+MMC
+---------------------------------------------------
+CONFIG_MMC_SH_MMCIF
+> Device Drivers
+	> MMC/SD/SDIO card support
+		[*] SuperH Internal MMCIF support
+
+
+SDHI SD/SDIO
+---------------------------------------------------
+CONFIG_MMC_SDHI
+> Device Drivers
+	> MMC/SD/SDIO card support
+		[*] SH-Mobile SDHI SD/SDIO controller support
+
+
+
+
+
+Ethernet
+---------------------------------------------------
+CONFIG_SH_ETH
+> Device Drivers
+	> Network device support
+		> Ethernet driver support
+			[*] Renesas SuperH Ethernet support
+
+
+
+Serial UARTS
+---------------------------------------------------
+SERIAL_SH_SCI
+> Device Drivers
+	> Character devices
+		> Serial drivers
+			[*] SuperH SCI(F) serial port support
+
+
+MTU2 (System Clock) (Selected automatically)
+---------------------------------------------------
+SH_TIMER_MTU2
+
+
+SPIBSC (QSPI)
+---------------------------------------------------
+SPI_SH_SPIBSC
+> Device Drivers
+	> SPI support
+		[*] Renesas SPIBSC controller for RZA1
+
+RSPI
+---------------------------------------------------
+SPI_SH_SPIBSC
+> Device Drivers
+	> SPI support
+		[*] Renesas RSPI/QSPI controller
+
+
+I2C (RIIC)
+---------------------------------------------------
+I2C_RIIC_RZA1
+> Device Drivers
+	> I2C support
+		> I2C Hardware Bus support
+			[*] Renesas RIIC adapter (Alternate for RZA1)
+
+Pin muxing/GPIO (pfc driver)
+---------------------------------------------------
+CONFIG_PINCTRL_SH_PFC
+> Device Drivers
+	> Pin controllers
+		[*] SuperH PFC GPIO support
+
+Display
+---------------------------------------------------
+FB_VDC5
+> Device Drivers
+	> Graphics support
+		> Support for frame buffer devices
+			> RZ/A1H frame-buffer driver for VDC5 (EXPERIMENTAL)
+
+  NOTE: To show boot text on LCD
+	CONFIG_FRAMEBUFFER_CONSOLE=y
+	CONFIG_VT=y   (needed to make a /dev/tty0)
+	CONFIG_VT_HW_CONSOLE_BINDING (to disconnect console from LCD after boot is done)
+	CONFIG_LOGO=y (penguin logo at top)
+	>> Add 'console=tty0' to boot arguments
+
+
+Touch screen driver
+---------------------------------------------------
+CONFIG_TOUCHSCREEN_FT5X06
+CONFIG_TOUCHSCREEN_FT5X06_SINGLE_TOUCH
+> Device Drivers
+	> Input device support
+		> Generic input layer (needed for keyboard, mouse, ...)
+		> Touchscreens
+			[*] Focaltech FT5X06 5 point touchscreen
+			[*]     FT5X06 touchscreen as single-touch
+
+NOR Flash
+---------------------------------------------------
+CONFIG_MTD_CFI=y
+CONFIG_MTD_CFI_AMDSTD=y
+CONFIG_MTD_PHYSMAP=y
+
+
+PWM
+---------------------------------------------------
+CONFIG_PWM_RZA1
+> Device Drivers
+	> Pulse-Width Modulation (PWM) Support
+		[*] RZ/A1 pwm support (TIOC4A)
+

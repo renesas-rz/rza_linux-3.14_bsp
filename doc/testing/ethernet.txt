@@ -1,8 +1,5 @@
         Board HW: Ethernet Connector
-             Bus: N/A
-     Device Addr: N/A
-Required package: N/A
-    In Buildroot: N/A
+
 
 NOTES:
 

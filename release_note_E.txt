@@ -14,14 +14,65 @@ Renesas Electronics America Corporation
     Renesas does not undertake any obligation to provide free of charge
     service and/or Q&A support for this contents.
 
-
-= Contents of the package(Note: [ ] is directory)
-
 = Versions
+    BaseVersion
+      U-Boot    : u-boot-2013.04
+      Linux     : linux-3.14
+      buildroot : buildroot-2014.05
 
 = Target board
+  CPU board         : Renesas RZ/A1 RSK Baord (YROK77120C000BE)
+  Option board      : RSK TFT APP Board (YROK77120C000BE)
+  Kit               : RTK7721000B00000BR
 
-  CPU board         : RSKRZA1
-  Option board      : 
+    [Linux]
+    List of device drivers which has been tested.
+        NOR Flash
+        QSPI Flash
+        USB Host
+        USB Device
+        ETHER
+        I2C
+        SERIAL
+        RTC
+	MMC
+	TIMER (& PWM)
+	LCD
+	AUDIO
+	DMA
+
+= Please refer to the follow documents: (in order)
+
+  <> Modifying the RSK board
+	doc/Board_Modifications.txt
+
+  <> Make sure your PC has the software it needs to build
+	doc/Host_PC_Requirements.txt
+
+  <> Building
+	doc/Building.txt
+
+  <> How to use the SEGGER JLINK Lite that comes with the RSK to program your board
+	doc/Programming_with_JLINK.txt
+
+  <> How to set up your serial port interface between the board and PC
+	doc/Serial_Port_Setup.txt
+
+  <> How to program in a MAC address into your board.
+	doc/MAC_Address_Setup.txt
+
+  <> How to boot the Linux kernel from u-boot
+	doc/kernel_booting.txt
+
+
+
+= Notes
+    - Before power off or reset the board, please unmount block devices 
+      such as USB/MTD or stop the system using poweroff command to avoid 
+      the data loss.
+
+
+
+
 
 

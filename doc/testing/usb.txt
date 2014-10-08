@@ -1,8 +1,4 @@
         Board HW: USB connector
-             Bus: N/A
-     Device Addr: N/A
-Required package: N/A
-    In Buildroot: N/A
 
 NOTES:
 

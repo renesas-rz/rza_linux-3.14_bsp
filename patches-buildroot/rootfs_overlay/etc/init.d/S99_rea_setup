@@ -1,0 +1,64 @@
+#!/bin/sh
+
+# Only run at system boot, not at system shutdown
+if [ "$1" != "start" ] ; then
+  exit
+fi
+
+
+# unbind displaying console messages on the LCD (and blinking cursor)
+if [ -e /sys/class/vtconsole/vtcon1/bind ]; then
+  echo 0 > /sys/class/vtconsole/vtcon1/bind
+  echo 0 > /sys/class/graphics/fbcon/cursor_blink
+fi
+
+# put splash image on LCD
+if [ -e /sys/devices/platform/vdc5fb.0/graphics/fb0/bits_per_pixel ] ; then
+  # make sure the LCD is running at 32bpp
+  if [ "$(cat /sys/devices/platform/vdc5fb.0/graphics/fb0/bits_per_pixel)" == "32" ] ;then
+    # only if the file exitst
+    if [ -e /root/images/splash.rgb.gz ]; then
+      # unzip the raw RGBA8888 file directly into the frame buffer
+      gunzip -c /root/images/splash.rgb.gz > /dev/fb0
+    fi
+  fi
+fi
+
+alias ll='ls -lap'
+	
+# set prompt
+#PS1='$ '
+PS1='\[\e[1;32m\]$\[\e[00m\] '
+
+### ALSA Sound Settings ####
+QUIET='-q'
+
+# Set up ALSA sound paramters
+#  'alsactl restore' pulls from /var/lib/alsa/asound.state
+alsactl restore
+#amixer $QUIET cset name="SSI0 Control" 1
+
+# Set LINE out volume (Left% , Right%)
+# amixer $QUIET sset 'Digital Audio Input',0 50%,50%
+
+# Check to see if we should run any demos
+# Only checks sda1 (first partition of a USB drive)
+SDA1_EXIST=$(cat /proc/partitions | grep sda1)
+
+if [ "$SDA1_EXIST" != "" ] ; then
+
+  if [ ! -e /mnt/sda1 ] ; then
+    mkdir /mnt/sda1
+  fi
+ 
+  mount /dev/sda1 /mnt/sda1
+
+  if [ -e /mnt/sda1/autorun.txt ] ; then
+    source /mnt/sda1/autorun.txt
+  fi
+
+  #umount /mnt/sda1
+
+fi
+
+

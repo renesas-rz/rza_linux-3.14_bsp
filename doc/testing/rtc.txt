@@ -1,0 +1,38 @@
+
+$ hwclock
+Thu Jan  1 00:00:49 1970  0.000000 seconds
+$ date --set="2014-09-26 10:51"
+Fri Sep 26 10:51:00 UTC 2014
+$ hwclock -w
+$ hwclock
+Fri Sep 26 10:51:10 2014  0.000000 seconds
+
+
+/* SystemClock -> HardwareClock */
+
+# date
+Thu Jan  1 00:13:55 UTC 1970
+# hwclock
+Thu Jan  1 00:13:55 1970  0.000000 seconds
+# date --set="2013-12-22 22:22"
+Sun Dec 22 22:22:00 UTC 2013
+# hwclock -w
+# hwclock
+Sun Dec 22 22:22:02 UTC 2013
+
+
+
+/* HardwareClock -> SystemClock */
+# Show system clock and RTC are different. Then set system clock based on RTC.
+$ date
+Sun Dec 22 22:22:03 UTC 2013
+
+$ hwclock
+Fri Sep 26 08:54:37 2014  0.000000 seconds
+$ hwclock -s
+$ date
+Fri Sep 26 08:54:58 UTC 2014
+
+
+
+

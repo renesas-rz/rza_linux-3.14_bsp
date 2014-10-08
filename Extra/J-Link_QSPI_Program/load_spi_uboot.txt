@@ -1,0 +1,13 @@
+rx 100
+exec SetSkipProgOnCRCMatch=0
+
+//
+// Download application into QSPI flash
+//
+
+loadbin u-boot.bin,0x18000000
+//verifybin u-boot.bin,0x18000000
+
+exit
+
+

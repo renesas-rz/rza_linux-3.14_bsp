@@ -1,8 +1,5 @@
         Board HW: LCD Panel that comes with the RSK
-             Bus: VDC 0
-     Device Addr: N/A
-Required package: N/A
-    In Buildroot: N/A
+             Bus: VDC5 ch0
 
 
 NOTES:

@@ -1,0 +1,31 @@
+Testing was done using a 2GB Transcent MMC PLUS Card
+
+
+$ dmesg | grep mmcif
+sh_mmcif supply vmmc not found, using dummy regulator
+sh_mmcif sh_mmcif: Failed getting OCR mask: -22
+sh_mmcif sh_mmcirandom: nonblocking pool is initialized
+f: could not set regulator OCR (-22)
+sh_mmcif sh_mmcif: driver version 2010-04-28
+
+$ ls /dev/mmc*
+/dev/mmcblk0    /dev/mmcblk0p1
+
+$ mount /dev/mmcblk0p1 /mnt
+$ mount | grep mmc
+/dev/mmcblk0p1 on /mnt type vfat (rw,relatime,fmask=0022,dmask=0022,codepage=437,iocharset=iso8859-1,shortname=mixed,errors=remount-ro)
+
+
+$ cd /mnt
+$ cp /bin/busybox /mnt
+$ sync
+$ ls -l
+total 608
+-rwxr-xr-x    1 root     root        605392 Jun  5 10:24 busybox
+
+$ /mnt/busybox | head -3
+BusyBox v1.22.1 (2014-09-17 15:22:07 EDT) multi-call binary.
+BusyBox is copyrighted by many authors between 1998-2012.
+Licensed under GPLv2. See source distribution for detailed
+
+

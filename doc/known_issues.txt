@@ -1,26 +1,34 @@
-= Known issues
+= Known issues and notes.
 
-    [U-Boot]
-        - When write data which is not 4 byte aligned to serial flash,
-          unexpected 1 to 3 byte data are written after the correct data to
-          align 4 byte.
-        - When read "4*n + 3" byte data, last 3 byte data are incorrect.
+[U-Boot]
 
-    [Linux]
-        - [ADC]
-            The values captured by ADC are not correct because of the LSI's
-            known bug. This issue will be fixed by using LSI WS2.0(2nd-cut).
-        - [USB Host]
-            Following issues are occurred when use some specific USB
-            memories.
-              RUF-C256M/U2   :Error or hang up while kernel boots
-        - [DISPLAY(VDC5)]
-            If you use analog RGB connector(J15) as output device,
-            strong flicker occurs when it displays fine checkered pattern and
-            so on. This issue may be better by adjusting timing of video
-            signal. Please refer to users manual.
-        - [I2C]
-            When writing multiple bytes into EEPROM by eeprog,
-            a write error occurs.
+[Linux]
+	[ rskrza1_deconfig ]
+	- The defualt configuration does not have all BSP driver enabled by default.
+	Please server to 'doc/kernel_drivers.txt' for a complete list of drivers
+	and how to enable/disable them.
+
+	[ XIP ]
+	- The rskrza1_xip_defconfig removes support for many drivers to save on RAM.
+	- The LCD is enabled, so 1.5MB of the internal RAM is reseved for the LCD
+	frame buffer.
+
+	[ SPIBSC ]
+	- When this driver is enabled and used for ch0, the RESET button the RSK board
+	does not work and you must remove power from the board to properly reset.
+	- The Spansion driver was modifed specifically for the SPIBSC driver becuase the SPIBSC
+	driver was written to intercept normal READ/WRITE command and convert them into QUAD
+	commands, but when the Spansion send a quad command the SPIBSC driver doesn't know
+	what to do with them.
+	- This driver cannot be used (for ch0) while in XIP mode becase that channel
+	is being used to fetch kernel code.
 
 
+	[I2C]
+	- The native RIIC driver that comes with the 3.14 kernel did not work right, so another
+	I2C driver devleope by Renesas was used in this BSP.
+
+	[ UIO/ JPEG ]
+	- The JPEG userspace sample driver/app (librzjpeg) requires a 1MB buffer in internal RAM
+	(see board-rskrza1.c). Therefore, it is disabled in the XIP configuration.
+	

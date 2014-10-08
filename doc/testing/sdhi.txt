@@ -1,0 +1,35 @@
+SD Card plugged into socket.
+
+# Plug in an SD CARD
+
+$ mmc1: new high speed SDHC card at address e624
+mmcblk0: mmc1:e624 SU04G 3.69 GiB
+ mmcblk0: p1
+
+$ ls /dev/mmc*
+/dev/mmcblk0    /dev/mmcblk0p1
+
+$ mount /dev/mmcblk0p1 /mnt
+
+
+$ mount /dev/mmcblk0p1 /mnt
+$ cd /mnt
+$ cp /bin/busybox .
+$ sync
+$ ls -l /mnt
+total 608
+-rwxr-xr-x    1 root     root        605392 Jun  5 10:26 busybox
+$ /bin/busybox | head -10
+BusyBox v1.22.1 (2014-09-17 15:22:07 EDT) multi-call binary.
+BusyBox is copyrighted by many authors between 1998-2012.
+Licensed under GPLv2. See source distribution for detailed
+copyright notices.
+
+Usage: busybox [function [arguments]...]
+   or: busybox --list[-full]
+   or: busybox --install [-s] [DIR]
+   or: function [arguments]...
+
+
+
+
