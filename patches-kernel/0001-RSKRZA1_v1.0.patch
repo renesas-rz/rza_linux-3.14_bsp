@@ -209,7 +209,7 @@ index 0000000..dc705e0
 +CONFIG_CRC16=y
 diff --git a/arch/arm/configs/rskrza1_xip_defconfig b/arch/arm/configs/rskrza1_xip_defconfig
 new file mode 100644
-index 0000000..b9c7a01
+index 0000000..a3e22b2
 --- /dev/null
 +++ b/arch/arm/configs/rskrza1_xip_defconfig
 @@ -0,0 +1,105 @@
@@ -516,10 +516,10 @@ index 3e92e3c..6c328d6 100644
  static const char * const genmai_boards_compat_dt[] __initconst = {
 diff --git a/arch/arm/mach-shmobile/board-rskrza1.c b/arch/arm/mach-shmobile/board-rskrza1.c
 new file mode 100644
-index 0000000..9807c6b
+index 0000000..a651769
 --- /dev/null
 +++ b/arch/arm/mach-shmobile/board-rskrza1.c
-@@ -0,0 +1,1386 @@
+@@ -0,0 +1,1366 @@
 +/*
 + * RSKRZA1 board support
 + *
@@ -618,12 +618,6 @@ index 0000000..9807c6b
 +		.type		= MT_DEVICE_NONSHARED
 +	},
 +#endif
-+	{
-+		.virtual	= 0xffefa000,
-+		.pfn		= __phys_to_pfn(0x3fefa000),
-+		.length		= SZ_64K,
-+		.type		= MT_DEVICE_NONSHARED
-+	},
 +};
 +
 +void __init rza1_map_io(void)
@@ -1840,20 +1834,6 @@ index 0000000..9807c6b
 +
 +static void __init rskrza1_init_late(void)
 +{
-+#if 0
-+	/* Turn on LED2 connected to the Port Expander */
-+	{
-+		u8 value;
-+		int ret;
-+		/* Register address 1 is the Output Contorl register */
-+		ret = rza1_i2c_read_byte(3, 0x20, 0x01, &value);
-+		value &= ~0x02;		/* bit 1 = L */
-+		if( !ret )
-+			rza1_i2c_write_byte(3, 0x20, 0x01, value);
-+		printk("%s: LED2 is now on.\n",__func__);
-+	}
-+#endif
-+
 +	/* Make SCIF4 availible. */
 +	/* Done here because we have to wait till i2c driver is ready */
 +#if (defined CONFIG_SPI_RSPI) && !(defined CONFIG_SH_ETH)
