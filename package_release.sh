@@ -5,7 +5,7 @@ TMP=/tmp/$NAME
 
 CUR_DIR=$(pwd)
 
-# Delete previous versions
+echo "Deleting previous versions..."
 if [ -e $TMP ] ; then
   rm -rf $TMP
 fi
@@ -19,10 +19,10 @@ if [ -e $NAME.tar.xz ] ; then
   rm $NAME.tar.xz
 fi
 
-
-# Make staging directory
+echo "Making staging directory..."
 mkdir -p $TMP
 
+echo "Copying directories..."
 cp -a doc $TMP
 cp -a Extra $TMP
 cp -a librzjpeg $TMP
@@ -30,16 +30,23 @@ cp -a patches-buildroot $TMP
 cp -a patches-kernel $TMP
 cp -a patches-uboot $TMP
 
+echo "Copying files..."
 cp -a build.sh $TMP
 cp -a release_note_E.txt $TMP
 cp -a setup_env.sh $TMP
 
+echo "TAR-ing $NAME..."
 cd $TMP
 cd ..
 tar -cf $NAME.tar $NAME
-mv $NAME.tar $CUR_DIR
 
+echo "Moving TAR back to local directory..."
+mv $NAME.tar $CUR_DIR
 cd $CUR_DIR
-bzip2 -k $NAME.tar
-xz -k $NAME.tar
+
+echo "Making BZ2..."
+bzip2 -kv $NAME.tar
+
+echo "Making XZ..."
+xz -kv $NAME.tar
 
