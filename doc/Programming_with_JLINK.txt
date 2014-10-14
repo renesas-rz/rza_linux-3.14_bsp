@@ -1,8 +1,10 @@
 Programming the Serial SPI Flash with the Segger JLINK
 
 The RZ/A1 RSK kit comes with a Segger Lite JTAG Adapter. In the directory
+
 	Extra/J-Link_QSPI_Program
-of this BSP are DOS scripts to program the images that you built into on-board serial
+
+are programming scripts to program binary images that you build into on-board serial
 flash (Dual SQPI).
 
 Simply copy the resulting binaries from your builds into this directory and rename
@@ -16,11 +18,14 @@ The individual binaries from the build.sh process can be found at these location
 	rskrza1_bsp/output/linux-3.14/arch/arm/boot/dts/r7s72100-rskrza1.dtb
 	rskrza1_bsp/output/buildroot-2014.05/output/images/rootfs.squashfs
 
-Then from a Windows PC, execute the DOS batch file "Program_QSPI.bat" and follow the
-directions on the screen.
+The J-Link_QSPI_Program directory contains scripts for both Linux and Windows. Both
+scripts perform the same operations and display detailed instructions.
 
-You will need to program each of these to boot the kernel (except for the fact
-that you will choose only uImage or xipImage as your kernel binary)
+	  LINUX: Program_QSPI.sh
+	WINDOWS: Program_QSPI.bat
+
+You will need to program all of the individual binary images to boot the kernel (except
+for the fact that you will choose only uImage or xipImage as your kernel binary)
 
 NOTE: Whenever you program the SPI Flash using this method, you will need to remove
 power from the board to reset it (just using the RESET button will not work).

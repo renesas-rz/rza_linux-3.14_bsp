@@ -31,7 +31,7 @@ echo 3 = Program Kernel (uImage)
 echo 4 = Program Kernel (xipImage)
 echo 5 = Program Rootfs
 echo 9 = Exit
-SET /P REPLY=Choose options: 
+SET /P REPLY=Choose option: 
 if "%REPLY%"== "1" (goto PROGRAM)
 if "%REPLY%"== "2" (goto PROGRAM)
 if "%REPLY%"== "3" (goto PROGRAM)

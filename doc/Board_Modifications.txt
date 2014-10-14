@@ -1,4 +1,7 @@
-NOTE: On later RSK builds, these issues were resolved, so you may not have to do any modifications.
+NOTE!!
+If your board is labeled as a "V1" or "V2", then these modifications are needed.
+
+
 
 ================================================
 ENABLE ETHERNET

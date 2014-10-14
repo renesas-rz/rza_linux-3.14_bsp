@@ -43,7 +43,7 @@ Renesas Electronics America Corporation
 
 = Please refer to the follow documents: (in order)
 
-  <> Modifying the RSK board
+  <> Modifying the RSK board (V1 and V2 boards)
 	doc/Board_Modifications.txt
 
   <> Make sure your PC has the software it needs to build
