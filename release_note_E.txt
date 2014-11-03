@@ -1,7 +1,8 @@
 RZ/A1H Linux BSP Release Note
 
 =============================================================
-September 2014
+Release V.1.0.0
+October 2014
 Renesas Electronics America Corporation
 
 = NOTIFICATION
