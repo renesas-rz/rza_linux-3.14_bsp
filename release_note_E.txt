@@ -42,30 +42,10 @@ Renesas Electronics America Corporation
 	AUDIO
 	DMA
 
-= Please refer to the follow documents: (in order)
-
-  <> Modifying the RSK board (V1 and V2 boards)
-	doc/Board_Modifications.txt
-
-  <> Make sure your PC has the software it needs to build
-	doc/Host_PC_Requirements.txt
-
-  <> Building
-	doc/Building.txt
-
-  <> How to use the SEGGER JLINK Lite that comes with the RSK to program your board
-	doc/Programming_with_JLINK.txt
-
-  <> How to set up your serial port interface between the board and PC
-	doc/Serial_Port_Setup.txt
-
-  <> How to program in a MAC address into your board.
-	doc/MAC_Address_Setup.txt
-
-  <> How to boot the Linux kernel from u-boot
-	doc/kernel_booting.txt
-
-
+= User Guide
+  Please refer to:
+	./doc/User_Guide.html
+  for instructions and information about this BSP
 
 = Notes
     - Before power off or reset the board, please unmount block devices 

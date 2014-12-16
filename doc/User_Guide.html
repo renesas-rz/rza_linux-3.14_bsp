@@ -1,0 +1,267 @@
+<HTML>
+<HEAD>
+<TITLE> RZ/A1 Linux BSP</TITLE>
+</HEAD>
+<BODY>
+<H1> RZ/A1 Linux BSP</H1>
+
+If this is the first time usign the BSP, please follow the below sections in order.
+
+<H2>Table of Contents</H2>
+<LI> Section 1: <A href="#S1"> Modifying the RSK board (V1 and V2 boards)</A>
+<LI> Section 2: <A href="#S2"> Make sure your PC has the software it needs to build</A>
+<LI> Section 3: <A href="#S3"> Building</A>
+<LI> Section 4: <A href="#S4"> How to use the SEGGER JLINK Lite that comes with the RSK to program your board</A>
+<LI> Section 5: <A href="#S5"> How to set up your serial port interface between the board and PC</A>
+<LI> Section 6: <A href="#S6"> How to program in a MAC address into your board.</A>
+<LI> Section 7: <A href="#S7"> How to boot the Linux kernel from u-boot</A>
+<HR>
+
+<!---------------------------------------------------------------------------->
+<A NAME="S1">
+<H2> Section 1: Modifying the RSK board (V1 and V2 boards)</H2>
+<PRE>
+NOTE!!
+If your board is labeled as a "V1" or "V2", then these modifications are needed.
+
+================================================
+ENABLE ETHERNET
+================================================
+To use Ethernet, RSK+RZA1H board configuration must be changed  by modifying link registers.
+
+	R104 : Fit -> Remove
+	R105 : Remove -> Fit
+
+Please refer to [6.1.8 Ethernet] of "RZ/A1H Group Renesas Starter Kit+  User's Manual For DS-5" for details. 
+
+The two resistors are right on the corner of the RZ chip between the silk screen text for IC1 and a Tantalum capacitor next to silk screen marking for IC20. 
+
+They are located together – the only two resistors in this area.
+Please see "Ethernet_Resistors.png" <A href="Ethernet_Resistors.png">Link</A>
+
+  IC1    oo|
+         oo|
+         oo|
+ooooooooooo|
+ooooooooooo|
+------------
+            o
+
+        [R105]
+        [R104]
+
+         ---------
+        |tantalum |
+        |capacitor|
+         ---------
+
+
+================================================
+REMOVE SD CARD DATA LINE PULL DOWN
+================================================
+During board manufacturing, a 0-Ohm resistor was populated when it was not supposed to be.
+
+Resistor R92 Needs to be removed.
+
+It is located on the bottom of the board near the CN1 card socket.
+
+Please see "SD_Resistor_Remove.jpg" <A href="SD_Resistor_Remove.jpg">Link</A>
+</PRE>
+
+<!---------------------------------------------------------------------------->
+<A NAME="S2">
+<H2> Section 2: Make sure your PC has the software it needs to build</H2>
+<PRE>
+1.Host PC
+	Install Ubuntu(12.04LTS or 14.04LTS) into a PC (or Virtual Machine) and ensure it has an Internet connection.
+	Please choose the 32-bit install of Ubuntu as the 64-bit version may cause issues when building
+	due to the pre-built toolchain.
+
+2.Additional packages
+	Install additional packages to the PC by executing following
+	commands:
+
+	$ sudo apt-get install u-boot-tools
+	$ sudo apt-get install ncurses-dev
+</PRE>
+
+<!---------------------------------------------------------------------------->
+<A NAME="S3">
+<H2> Section 3: Building</H2>
+<PRE>
+To build this BSP, please open a terminal window in Linux and change into the base
+directory of this BSP. From there, type:
+
+	./build.sh
+
+This will show you your options on what you can build.
+For best results, run each build stage one at a time in the order they
+appeared in the help message.
+
+
+You may continue to use the build.sh script for individual component development.
+For example, to add/remove kernel driver support, you can run:
+	$ ./build.sh kernel menuconfig
+
+Or to add more software packages to your root file system:
+	$ ./build.sh buildroot menuconfig
+
+
+
+To build the XIP version of the kernel, run the following (instead of
+the defualt "./build.sh kernel")
+	$ ./build.sh kernel rskrza1_xip_defconfig
+	$ ./build.sh kernel xipImage
+</PRE>
+
+<!---------------------------------------------------------------------------->
+<A NAME="S4">
+<H2> Section 4: How to use the SEGGER JLINK Lite that comes with the RSK to program your board</H2>
+<PRE>
+Programming the Serial SPI Flash with the Segger JLINK
+
+The RZ/A1 RSK kit comes with a Segger Lite JTAG Adapter. In the directory
+
+	Extra/J-Link_QSPI_Program
+
+are programming scripts to program binary images that you build into on-board serial
+flash (Dual SQPI).
+
+Simply copy the resulting binaries from your builds into this directory and rename
+them to end in ".bin" (overwritting the existing ones).
+
+The individual binaries from the build.sh process can be found at these locations:
+
+	rskrza1_bsp/output/u-boot-2013.04/u-boot.bin
+	rskrza1_bsp/output/linux-3.14/arch/arm/boot/uImage
+	rskrza1_bsp/output/linux-3.14/arch/arm/boot/xipImage (for XIP builds)
+	rskrza1_bsp/output/linux-3.14/arch/arm/boot/dts/r7s72100-rskrza1.dtb
+	rskrza1_bsp/output/buildroot-2014.05/output/images/rootfs.squashfs
+
+The J-Link_QSPI_Program directory contains scripts for both Linux and Windows. Both
+scripts perform the same operations and display detailed instructions.
+
+	  LINUX: Program_QSPI.sh
+	WINDOWS: Program_QSPI.bat
+
+You will need to program all of the individual binary images to boot the kernel (except
+for the fact that you will choose only uImage or xipImage as your kernel binary)
+
+NOTE: Whenever you program the SPI Flash using this method, you will need to remove
+power from the board to reset it (just using the RESET button will not work).
+However, you may program multiple images (run the BATCH file multiple times) without
+having to power cycle between each program session.
+</PRE>
+
+<!---------------------------------------------------------------------------->
+<A NAME="S5">
+<H2> Section 5: How to set up your serial port interface between the board and PC</H2>
+<PRE>
+Serial Port Setup
+
+You will need a serial port connection between the board and the PC.
+The RSK board has an USB-to_Serial device already mounted, so you only need
+to connect the USB cable that comes with the kit to between connector CN18 and
+your PC.
+
+	baudrate    :115200 bps
+	data        :     8 bit
+	parity      :  none
+	stop        :     1 bit
+	flow control:  none
+
+
+Linux:
+Linux will already have native support for this USB-to-Serial converter.
+It should show up as /dev/ttyACM0. Therefore, you can use it like:
+
+	$ minicom -D /dev/ttyACM0 -b 115200
+
+	NOTE: minicom is not pre-installed, so you ahve to do a 'apt-get install minicom'
+	NOTE: To close minicom, press Ctrl+A, then 'q'
+
+Windows:
+While windows nativly suports a CDC class driver, you will need to point it
+to a .INF file. That INF file comes on the RZ/A1 RSK CD.
+You can also find it in the BSP in the "Extra" directory.
+</PRE>
+
+<!---------------------------------------------------------------------------->
+<A NAME="S6">
+<H2> Section 6: How to program in a MAC address into your board.</H2>
+<PRE>
+Setup MAC Address
+
+This is done in u-boot.
+
+Connect AC adapter and power on the CPU board.
+Push space key of the terminal as soon as possible after
+power on to stop autoboot.
+
+MAC Address is stored in eeprom(0x08000000 ~ 0x08000007).
+First two bytes are 0, and following 6 bytes as MAC Address.
+
+An example of eeprom writing procedure is as follows:
+
+(1) Write
+
+	Ex. MAC Address = 66:55:44:33:22:11
+	  * Use MAC address printed on the label on the board.
+
+	=> mm.b 0x08000000
+		First 2byte should be set 0.
+		ex) 08000000: XX ? 0
+		    08000001: XX ? 0
+		Set MAC Address.
+		and exit to push "." key.
+		ex) 08000002: XX ? 66
+		    08000003: XX ? 55
+		    08000004: XX ? 44
+		    08000005: XX ? 33
+		    08000006: XX ? 22
+		    08000007: XX ? 11
+		    08000008: XX ? .
+	=> md.b 0x08000000 8
+		ex)08000000: 00 00 66 55 44 33 22 11
+	=> eeprom write 0x08000000 0 8
+		ex)EEPROM @0x50 write: addr 08000000  off 0000  count 8 ... done
+
+(2) Check
+	=> eeprom read 0x08000000 0 8
+		ex)EEPROM @0x50 read: addr 08000000  off 0000  count 8 ... done
+	=> md.b 0x08000000 8
+		ex)08000000: 00 00 66 55 44 33 22 11
+
+</PRE>
+
+<!---------------------------------------------------------------------------->
+<A NAME="S7">
+<H2> Section 7: How to boot the Linux kernel from u-boot</H2>
+<PRE>
+Linux kernel booting
+
+If all the defaults of this BSP were used to build the images, and you used the JLINK
+programming scripts in the Extra directory to program the serial SPI flash, you may
+use the follow commands in u-boot to boot your board.
+
+
+# Boot the uImage kernel image
+# The external SDRAM will be used for system memory (default)
+
+=> run s_boot
+
+
+# Boot the xipIamge kernel image
+# Kernel will run directly from QUAD SPI Flash and internal chip RAM will used
+# for system memory.
+
+=> run x_boot
+
+
+File system login will be "root" (no password)
+</PRE>
+
+
+</BODY>
+</HTML>
+
