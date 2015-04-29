@@ -132,11 +132,12 @@ them to end in ".bin" (overwritting the existing ones).
 
 The individual binaries from the build.sh process can be found at these locations:
 
-	rskrza1_bsp/output/u-boot-2013.04/u-boot.bin
+	rskrza1_bsp/output/u-boot-2015.01/u-boot.bin
 	rskrza1_bsp/output/linux-3.14/arch/arm/boot/uImage
 	rskrza1_bsp/output/linux-3.14/arch/arm/boot/xipImage (for XIP builds)
 	rskrza1_bsp/output/linux-3.14/arch/arm/boot/dts/r7s72100-rskrza1.dtb
 	rskrza1_bsp/output/buildroot-2014.05/output/images/rootfs.squashfs
+	rskrza1_bsp/output/axfs/rootfs.axfs.bin
 
 The J-Link_QSPI_Program directory contains scripts for both Linux and Windows. Both
 scripts perform the same operations and display detailed instructions.
@@ -144,10 +145,27 @@ scripts perform the same operations and display detailed instructions.
 	  LINUX: Program_QSPI.sh
 	WINDOWS: Program_QSPI.bat
 
-You will need to program all of the individual binary images to boot the kernel (except
-for the fact that you will choose only uImage or xipImage as your kernel binary)
+IMPORTANT:
+You will need to program multiple binary images to boot the kernel.
+Please review the information below:
 
-NOTE: Whenever you program the SPI Flash using this method, you will need to remove
+1 = Program u-boot                 >> Program at least once
+2 = Program Device Tree Blob       >> Program at least once
+3 = Program Kernel (uImage)        >> If you choose this, don't select #4
+4 = Program Kernel (xipImage)      >> If you choose this, don't select #3
+5 = Program Rootfs (squashfs)      >> If you choose this, don't select #6
+6 = Program Rootfs (axfs)          >> If you choose this, don't select #5
+9 = Exit
+
+Example programming/boot sequences:
+
+SDRAM Boot: #1, #2, #3, #5, #9. Then use "=> run s_boot" in u-boot
+  XIP Boot: #1, #2, #4, #5, #9. Then use "=> run x_boot" in u-boot
+  XIP Boot: #1, #2, #4, #6, #9. Then use "=> run xa_boot" in u-boot
+
+
+IMPORTANT:
+Whenever you program the SPI Flash using this method, you will need to remove
 power from the board to reset it (just using the RESET button will not work).
 However, you may program multiple images (run the BATCH file multiple times) without
 having to power cycle between each program session.
@@ -247,6 +265,7 @@ use the follow commands in u-boot to boot your board.
 
 # Boot the uImage kernel image
 # The external SDRAM will be used for system memory (default)
+# A squashfs file system should be programmed into the QSPI
 
 => run s_boot
 
@@ -254,8 +273,16 @@ use the follow commands in u-boot to boot your board.
 # Boot the xipIamge kernel image
 # Kernel will run directly from QUAD SPI Flash and internal chip RAM will used
 # for system memory.
+# A squashfs file system should be programmed into the QSPI
 
 => run x_boot
+
+# Boot the xipIamge kernel image
+# Kernel will run directly from QUAD SPI Flash and internal chip RAM will used
+# for system memory.
+# A AXFS file system should be programmed into the QSPI
+
+=> run xa_boot
 
 
 File system login will be "root" (no password)

@@ -1,8 +1,20 @@
 Below are the configuraiton symbols and  menuconfig locations for each kernel driver.
 
 ---------------------------------------------------
-NOTE: You can search for any driver location from within menuconfig by pressing
-the '/' key and then entering the configuration symbol name.
+Searching
+---------------------------------------------------
+You can search for any driver location from within menuconfig by pressing
+the '/' key and then entering the configuration symbol name (but leave off
+the 'CONFIG_' at the begining).
+In the seach results, there will be a number in parenthesis under the
+"Location:" section (Example: (1) ), and if you press that number on the
+keyboard it will bring you to that level in the full location.
+If you are wondering why it won't bring you all the way to the actual
+specific driver location, it is becase you don't have all the other levels
+in the path enabled yet. You can see that by the "[=n]" in each level of 
+the path before it gets to your driver name. Meaning, you are going to
+have to first enable each level in the patch before you can turn on that
+particular driver.
 ---------------------------------------------------
 
 
@@ -17,6 +29,7 @@ CONFIG_SND_SCUX_RSKRZA1:
 					[*] SCUX sound support on RSK-RZA1
 
 NOTE: You also need to enable:
+	CONFIG_RZA1_DMAE
 	CONFIG_SND_MIXER_OSS
 	CONFIG_SND_PCM_OSS
 	CONFIG_SND_PCM_OSS_PLUGINS
@@ -43,6 +56,11 @@ CONFIG_USB_R8A66597
 		> USB Gadget Support
 			> USB Peripheral Controller
 				[*] Renesas R8A66597 USB Peripheral Controller
+
+NOTE: If you want to read a USB flash driver, you will also need:
+	CONFIG_SCSI
+	CONFIG_BLK_DEV_SD
+	CONFIG_USB_STORAGE
 
 
 DMA
@@ -192,4 +210,40 @@ CONFIG_PWM_RZA1
 > Device Drivers
 	> Pulse-Width Modulation (PWM) Support
 		[*] RZ/A1 pwm support (TIOC4A)
+
+CAN
+---------------------------------------------------
+CONFIG_CAN_RZA1=y
+	NOTE 1: The following must also be enabled to use the CAN driver:
+		CONFIG_NET=y
+		CONFIG_PACKET=y
+		CONFIG_UNIX=y
+		CONFIG_INET=y
+		CONFIG_CAN=y
+
+CEU (Camera)
+---------------------------------------------------
+"SuperH Mobile CEU Interface driver"
+CONFIG_VIDEO_SH_MOBILE_CEU=y
+
+	NOTE 1: The following must also be enabled before you can enable the CEU driver:
+		"Multimedia support"
+		CONFIG_MEDIA_SUPPORT=y
+
+		"Cameras/video grabbers support"
+		MEDIA_CAMERA_SUPPORT
+
+		"V4L platform devices"
+		CONFIG_V4L_PLATFORM_DRIVERS
+
+		"SoC camera support"
+		CONFIG_SOC_CAMERA=y
+
+		"SuperH Mobile CEU Interface driver"
+		CONFIG_VIDEO_SH_MOBILE_CEU=y
+
+	NOTE 2: If you have a OV7670, here is the config to turn that on:
+		"ov7670 camera support"
+		CONFIG_SOC_CAMERA_OV7670=y
+
 

@@ -14,12 +14,9 @@ fi
 
 # put splash image on LCD
 if [ -e /sys/devices/platform/vdc5fb.0/graphics/fb0/bits_per_pixel ] ; then
-  # make sure the LCD is running at 32bpp
-  if [ "$(cat /sys/devices/platform/vdc5fb.0/graphics/fb0/bits_per_pixel)" == "32" ] ;then
-    # only if the file exitst
-    if [ -e /root/images/splash.rgb.gz ]; then
-      # unzip the raw RGBA8888 file directly into the frame buffer
-      gunzip -c /root/images/splash.rgb.gz > /dev/fb0
+    # only if the file exists
+    if [ -e /root/images/renesas_logo-800x480.jpg ]; then
+      fbv -s 1 -c /root/images/renesas_logo-800x480.jpg
     fi
   fi
 fi

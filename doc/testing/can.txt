@@ -1,0 +1,67 @@
+---------------------------------------------------------
+DRIVER INFO:
+---------------------------------------------------------
+* The driver was taken from here:
+	https://github.com/carlocaione/meta-hachiko
+* The CAN driver was written by Carlo Caione. He is an Linux Embedded Engineer at Endless Mobile in Italy.
+  He approved it to be added to the Renesas BSP as it is GPL licensed and open source.
+	https://www.linkedin.com/in/carlocaione
+* The driver registers a standard CAN driver which will then use the kernel's existing APIs. It uses the standard\
+  network subsystem of the kernel (like an Ethernet driver does).
+	http://lxr.free-electrons.com/source/drivers/net/can/dev.c?v=3.14
+* The 3 interfaces the can driver registers are:
+	rz_can_open()
+	rz_can_close()
+	rz_can_start_xmit()
+
+* For receive, when an RX interrupt comes in, the driver fills out a "struct can_frame" and then posts it back to the application. 
+  The packet is then pushed back to the network stack via SKB.
+	http://lxr.free-electrons.com/source/include/uapi/linux/can.h?v=3.14#L68
+* Transmit also uses the struct can_frame to send data.
+* When a packet is sent, it is looped back by simply pushing a duplicate SKB back on the linux network stack.
+* Basically, since there is not much to the driver, it just sends and receive raw data.
+
+
+---------------------------------------------------------
+TESTING
+---------------------------------------------------------
+* Only the RZ/A1 RSK was used for testing.
+* Only XIP_KERNEL was used to test the driver (not uImage)
+* Only static driver (not module) was used for testing.
+* Only CAN channel 1 was tested
+* On the RSK board, R104 and R105 need to be modifed (from Ethernet to CAN)
+* Used a SYSTec USB CAN analyzer (for sniffing and sending traffic)
+* Becasue the standard IP command that comes with Busybox doesn't suppor the CAN extension, iproute2 need to be build and used. That can be added usign Buildroot.
+* The open source 'can-utils' package was used. It was selected in Buildroot.
+
+
+After boot, here was the test procedure. Commands are ented at the sheel prompt.
+
+[[ Set bit rate ]]
+Welcome to Buildroot
+buildroot login: root
+Thu Jan  1 09:00:00 UTC 2015
+$ 
+$ /sbin/ip link set can0 up type can bitrate 125000
+rz_can rz_can.1 can0: bitrate error 0.2%
+$
+
+[[ TX TEST (used 'cansend' from can-uitils and custom app) ]]
+$ /usr/bin/cansend can0 500#1E.10.10
+$
+$ ./can_test
+CAN test
+119: s = 3
+125: ret = 0
+134: ret = 0
+142: len = 16
+156: len = 16
+
+[[ RX TEST (used 'candump' from can-uitils)]]
+$ /usr/bin/candump can0
+  can0  051   [8]  01 02 03 04 05 06 07 08
+  can0  051   [8]  01 02 03 04 05 06 07 08
+  can0  051   [8]  01 02 03 04 05 06 07 08
+  can0  051   [8]  01 02 03 04 05 06 07 08
+$ 
+$ 

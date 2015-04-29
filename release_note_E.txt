@@ -1,8 +1,8 @@
 RZ/A1H Linux BSP Release Note
 
 =============================================================
-Release V.1.0.0
-October 2014
+Release V.1.1.0
+April 2015
 Renesas Electronics America Corporation
 
 = NOTIFICATION
@@ -17,7 +17,7 @@ Renesas Electronics America Corporation
 
 = Versions
     BaseVersion
-      U-Boot    : u-boot-2013.04
+      U-Boot    : u-boot-2015.01
       Linux     : linux-3.14
       buildroot : buildroot-2014.05
 
@@ -35,12 +35,15 @@ Renesas Electronics America Corporation
         ETHER
         I2C
         SERIAL
+	SPI
         RTC
 	MMC
 	TIMER (& PWM)
 	LCD
 	AUDIO
 	DMA
+	CAN
+	CEU (Camera)
 
 = User Guide
   Please refer to:
@@ -54,6 +57,18 @@ Renesas Electronics America Corporation
 
 
 
+Revision History:
+-------------------------------------------------------------
+Release V.1.0.0
+- October 2014
+- Initial Release
 
-
+Release V.1.1.0
+- April 2015
+- Updated kernel to 3.14.28-LTSI
+- Updated u-boot to 2015.01
+- Added Advanced XIP File System (AXFS) support
+- Allow uclibc as a toolchain option for application building
+- Added drivers CAN and CEU
+- bug fixes and driver enhancements
 

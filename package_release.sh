@@ -1,6 +1,6 @@
 #!/bin/bash
 
-NAME=RSKRZA1-BSP-V1.0.0
+NAME=RSKRZA1-BSP-V1.1.0
 TMP=/tmp/$NAME
 
 CUR_DIR=$(pwd)
@@ -19,10 +19,15 @@ if [ -e $NAME.tar.xz ] ; then
   rm $NAME.tar.xz
 fi
 
+echo "Removing execute attributes left over for Windows testing..."
+chmod -x Extra/J-Link_QSPI_Program/*
+chmod +x Extra/J-Link_QSPI_Program/*.sh
+
 echo "Making staging directory..."
 mkdir -p $TMP
 
 echo "Copying directories..."
+cp -a axfs $TMP
 cp -a doc $TMP
 cp -a Extra $TMP
 cp -a librzjpeg $TMP
