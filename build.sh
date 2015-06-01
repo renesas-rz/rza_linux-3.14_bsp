@@ -178,7 +178,7 @@ if [ "$1" == "u-boot" ] ; then
 
   # Download u-boot-2015.01.tar.bz2
   if [ ! -e u-boot-2015.01.tar.bz2 ] ;then
-    wget http://ftp.denx.de/pub/u-boot/u-boot-2015.01.tar.bz2
+    wget ftp://ftp.denx.de/pub/u-boot/u-boot-2015.01.tar.bz2
   fi
 
   # extract u-boot-2015.01
