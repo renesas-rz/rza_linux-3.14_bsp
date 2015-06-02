@@ -1,7 +1,7 @@
 RZ/A1H Linux BSP Release Note
 
 =============================================================
-Release V.1.1.0
+Release V.1.1.1
 April 2015
 Renesas Electronics America Corporation
 
@@ -71,4 +71,8 @@ Release V.1.1.0
 - Allow uclibc as a toolchain option for application building
 - Added drivers CAN and CEU
 - bug fixes and driver enhancements
+
+Release V.1.1.1
+- May 2015
+- Download u-boot from FTP server instead of HTTP server
 
