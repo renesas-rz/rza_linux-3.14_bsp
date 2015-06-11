@@ -438,7 +438,8 @@ if [ "$1" == "axfs" ] ; then
   #   a "Permission denieded" message after the file system is mounted"
   chmod a-s $BUILDROOT_DIR/output/target/bin/busybox
 
-  ./mkfs.axfs -s -a $BUILDROOT_DIR/output/target rootfs.axfs.bin
+  #./mkfs.axfs -s -a $BUILDROOT_DIR/output/target rootfs.axfs.bin
+  ./mkfs.axfs -s -a ../buildroot-2014.05/output/target rootfs.axfs.bin
 
   if [ ! -e rootfs.axfs.bin ] ; then
     # did not build, so exit
