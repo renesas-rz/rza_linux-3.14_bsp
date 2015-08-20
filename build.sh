@@ -120,6 +120,16 @@ fi
 if [ "$1" == "kernel" ] ; then
   banner_yellow "Building kernel"
 
+  if [ "$2" == "" ] ; then
+    echo " "
+    echo "What do you want to build?"
+    echo "For example:  (case sensitive)"
+    echo " Traditional kernel:  ./build.sh kernel uImage"
+    echo "         XIP kernel:  ./build.sh kernel xipImage"
+    echo "  Kernel config GUI:  ./build.sh kernel menuconfig"
+    exit
+  fi
+
   cd $OUTDIR
 
   # Download linux-3.14
@@ -141,15 +151,30 @@ if [ "$1" == "kernel" ] ; then
     cat $ROOTDIR/patches-kernel/* > /tmp/kernel_patches.patch
     patch -p1 -i /tmp/kernel_patches.patch
 
-    # Configure Kernel
-    make rskrza1_defconfig
   fi
 
+  IMG_BUILD=0
   # Build kernel
-  if [ "$2" == "" ] ;then
-    # By default, build uImage
-    make -j4 uImage
-    make -j4 dtbs
+  if [ "$2" == "uImage" ] ;then
+    IMG_BUILD=1
+    if [ ! -e .config ] ; then
+      # Need to configure kernel first
+      make rskrza1_defconfig
+    fi
+  fi
+  if [ "$2" == "xipImage" ] ;then
+    IMG_BUILD=1
+    if [ ! -e .config ] ; then
+      # Need to configure kernel first
+      make rskrza1_xip_defconfig
+    fi
+  fi
+
+  if [ "$IMG_BUILD" == "1" ] ; then
+    # NOTE: We have to make the Device Tree Blobs too, so we'll add 'dtbs' to
+    #       the command line
+    echo -e "make -j4 $2 dtbs\n"
+    make -j4 $2 dtbs
 
     if [ ! -e vmlinux ] ; then
       # did not build, so exit
