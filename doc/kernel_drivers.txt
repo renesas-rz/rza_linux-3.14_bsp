@@ -177,6 +177,10 @@ FB_VDC5
 	> Graphics support
 		> Support for frame buffer devices
 			> RZ/A1H frame-buffer driver for VDC5 (EXPERIMENTAL)
+  NOTE:
+   You may need to set the display mode to durn the LCD on.
+   $ cat /sys/devices/platform/vdc5fb.0/graphics/fb0/modes > /sys/devices/platform/vdc5fb.0/graphics/fb0/mode
+
 
   NOTE: To show boot text on LCD
 	CONFIG_FRAMEBUFFER_CONSOLE=y

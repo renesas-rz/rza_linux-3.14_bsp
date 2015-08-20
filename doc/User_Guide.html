@@ -15,6 +15,7 @@ If this is the first time usign the BSP, please follow the below sections in ord
 <LI> Section 5: <A href="#S5"> How to set up your serial port interface between the board and PC</A>
 <LI> Section 6: <A href="#S6"> How to program in a MAC address into your board.</A>
 <LI> Section 7: <A href="#S7"> How to boot the Linux kernel from u-boot</A>
+<LI> Section 8: <A href="#S8"> Tracking Upstream Changes</A>
 <HR>
 
 <!---------------------------------------------------------------------------->
@@ -98,6 +99,12 @@ This will show you your options on what you can build.
 For best results, run each build stage one at a time in the order they
 appeared in the help message.
 
+For building the Linux kernel, you can choose to build a traditional kernel that
+will execute from RAM (uImage) or an XIP kernel that will execute directly from
+Flash (xipImage). Since this is an ARM architecture, the "Device Tree Blobs"
+will also be built ('dtbs' is added to the end of command line) and also programmed
+into your boards.
+
 
 You may continue to use the build.sh script for individual component development.
 For example, to add/remove kernel driver support, you can run:
@@ -106,12 +113,16 @@ For example, to add/remove kernel driver support, you can run:
 Or to add more software packages to your root file system:
 	$ ./build.sh buildroot menuconfig
 
-
-
-To build the XIP version of the kernel, run the following (instead of
-the defualt "./build.sh kernel")
-	$ ./build.sh kernel rskrza1_xip_defconfig
+To build the minimum RAM version of the XIP kernel, run the following:
+	$ ./build.sh kernel rskrza1_xip_min_defconfig
 	$ ./build.sh kernel xipImage
+	$ ./build.sh kernel dtbs
+
+
+NOTE: If you've already built a 'uImage', and now you want to build a 'xipImage', you must
+first run the following command:
+	$ ./build.sh kernel distclean
+
 </PRE>
 
 <!---------------------------------------------------------------------------->
@@ -286,6 +297,36 @@ use the follow commands in u-boot to boot your board.
 
 
 File system login will be "root" (no password)
+</PRE>
+<!---------------------------------------------------------------------------->
+<A NAME="S8">
+<H2> Section 8: Tracking Upstream Changes</H2>
+<PRE>
+In between BSP releases, new features and bug fixes are applied and checked into
+a public github account. If you would like to set up your BSP build environment so
+that you can easily retrive the lastest u-boot and kernel, follow these instructions.
+
+
+$ git clone https://github.com/renesas-rz/rskrza1_bsp.git
+$ cd rskrza1_bsp
+$ mkdir output
+$ cd output
+$ git clone https://github.com/renesas-rz/linux-3.14.git
+$ git clone https://github.com/renesas-rz/u-boot-2015.01.git
+$ cd ..
+
+Now you can execute ./build.sh as outline in <A href="#S3">Section 3</A>.
+
+
+To pull in the latest BSP changes:
+
+$ cd output/linux-3.14
+$ git pull
+$ cd ../..
+$ cd output/u-boot-2015.01
+$ git pull
+$ cd ../..
+
 </PRE>
 
 
