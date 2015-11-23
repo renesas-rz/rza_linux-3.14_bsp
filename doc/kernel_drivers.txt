@@ -224,6 +224,7 @@ CONFIG_CAN_RZA1=y
 		CONFIG_UNIX=y
 		CONFIG_INET=y
 		CONFIG_CAN=y
+		CONFIG_CAN_RAW=y
 
 CEU (Camera)
 ---------------------------------------------------
