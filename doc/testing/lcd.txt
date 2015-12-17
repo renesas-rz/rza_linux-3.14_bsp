@@ -17,3 +17,39 @@ bootargs. Example:
 	bootargs = 'console=ttySC2,115200 console=tty0'
 
 
+If you boot without "console=tty0", you will have to set a video mode before
+the LCD will become active. An easy way is to echo one of the supported 'modes' to the
+'mode' sysfs file.
+Example (setting the LCD to the first mode in the list)
+$ cd /sys/devices/platform/vdc5fb.0/graphics/fb0/
+$ head -1 modes > mode
+
+head -1
+
+--------------
+ LVDS Testing
+--------------
+
+== HARDWARE ==
+For the RSK Board:
+ - CN17: Pins 14 and 15 (CLK +/-) need to be swapped (I modified a cable)
+ - Remove R167: (FCE_NAND - NAND Flash)
+ - Populate R168: (P5_5_TXOUT1M)
+ - Remove R169 (SPDIF_IN - sound)
+ - Populate R170 (P5_6_TXOUT0P)
+ - Populate R211 (to enable LCD backlight)
+ - Remove R182 (P5_7_TXOUT0M) (populated by default)
+ - Populate R183 (SPDIF_OUT)(DNF by default)
+
+== SOFTWARE ==
+ - Built kerel as uImage
+ - In arch/arm/mach-shmobile/rskrza1.c, uncomment "#define USE_LVDS"
+
+== USERLAND ==
+ - To enable the display, you need to set the 'mode' to one of the options listed in 'modes'
+	$ echo U:1280x800p-60 > /sys/devices/platform/vdc5fb.1/graphics/fb1/mode
+ - Used 'fbv' to display a JPEG on the LVDS dislay (/dev/fb1). You need to set
+   "FRAMEBUFFER=/dev/fb1" to tell fbv where to display to.
+	$ export FRAMEBUFFER=/dev/fb1
+	$ fbv /mnt/mountain-1280x800.jpg
+
