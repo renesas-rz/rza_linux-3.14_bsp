@@ -55,32 +55,32 @@ echo "------------------------------------------------------------------------"
 
 # =====u-boot========
 if [ "$REPLY" == "1" ]; then
-  JLinkExe -speed 12000 -if JTAG -device R7S721001 -CommanderScript load_spi_uboot.txt
+  JLinkExe -speed 15000 -if JTAG -device R7S721001 -CommanderScript load_spi_uboot.txt
 fi
 
 # =====Device Tree Blob========
 if [ "$REPLY" == "2" ]; then
-  JLinkExe -speed 12000 -if JTAG -device R7S721001 -CommanderScript load_spi_dtb.txt
+  JLinkExe -speed 15000 -if JTAG -device R7S721001 -CommanderScript load_spi_dtb.txt
 fi
 
 # =====Kernel (uImage)========
 if [ "$REPLY" == "3" ]; then
-  JLinkExe -speed 12000 -if JTAG -device R7S721001_DualSPI -CommanderScript load_spi_kernel_uImage.txt
+  JLinkExe -speed 15000 -if JTAG -device R7S721001_DualSPI -CommanderScript load_spi_kernel_uImage.txt
 fi
 
 # =====Kernel (xipImage)========
 if [ "$REPLY" == "4" ]; then
-  JLinkExe -speed 12000 -if JTAG -device R7S721001_DualSPI -CommanderScript load_spi_kernel_xipImage.txt
+  JLinkExe -speed 15000 -if JTAG -device R7S721001_DualSPI -CommanderScript load_spi_kernel_xipImage.txt
 fi
 
 # =====Rootfs (squashfs)========
 if [ "$REPLY" == "5" ]; then
-  JLinkExe -speed 12000 -if JTAG -device R7S721001_DualSPI -CommanderScript load_spi_rootfs_squashfs.txt
+  JLinkExe -speed 15000 -if JTAG -device R7S721001_DualSPI -CommanderScript load_spi_rootfs_squashfs.txt
 fi
 
 # =====Rootfs (axfs)========
 if [ "$REPLY" == "6" ]; then
-  JLinkExe -speed 12000 -if JTAG -device R7S721001_DualSPI -CommanderScript load_spi_rootfs_axfs.txt
+  JLinkExe -speed 15000 -if JTAG -device R7S721001_DualSPI -CommanderScript load_spi_rootfs_axfs.txt
 fi
 
 echo "------------------------------------------------------------------------"
