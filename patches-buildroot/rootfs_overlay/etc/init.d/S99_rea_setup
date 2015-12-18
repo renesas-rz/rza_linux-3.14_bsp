@@ -18,7 +18,6 @@ if [ -e /sys/devices/platform/vdc5fb.0/graphics/fb0/bits_per_pixel ] ; then
     if [ -e /root/images/renesas_logo-800x480.jpg ]; then
       fbv -s 1 -c /root/images/renesas_logo-800x480.jpg
     fi
-  fi
 fi
 
 alias ll='ls -lap'
