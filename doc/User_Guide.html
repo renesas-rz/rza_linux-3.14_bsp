@@ -16,6 +16,7 @@ If this is the first time usign the BSP, please follow the below sections in ord
 <LI> Section 6: <A href="#S6"> How to program in a MAC address into your board.</A>
 <LI> Section 7: <A href="#S7"> How to boot the Linux kernel from u-boot</A>
 <LI> Section 8: <A href="#S8"> Tracking Upstream Changes</A>
+<LI> Section 9: <A href="#S9"> Installing J-Link Software for Linux</A>
 <HR>
 
 <!---------------------------------------------------------------------------->
@@ -326,6 +327,32 @@ $ cd ../..
 $ cd output/u-boot-2015.01
 $ git pull
 $ cd ../..
+
+</PRE>
+
+
+<!---------------------------------------------------------------------------->
+<A NAME="S9">
+<H2> Section 9: Installing J-Link Software for Linux</H2>
+<PRE>
+These are the instructions for installing the Segger Jlink drivers and utilities for Linux. This example is for a host running a 32-bit Ubuntu (Debian).
+
+Download "Software and documentation pack for Linux V5.00i, DEB Installer 32-bit version" from
+
+	https://www.segger.com/jlink-software.html
+
+Installing any later version than V5.00i is OK.
+
+In a command window, install the downloaded file:
+
+	$ sudo dpkg -i jlink_5.0.9_i386.deb
+
+After the install, on a command line you can type "JLink" then hit the 'tab' key on your keyboard to see all the utilities it
+installed. You should see something like this:
+
+$ JLink
+JLinkDebugger JLinkGDBServer JLinkRTTClient JLinkSWOViewer
+JLinkExe JLinkRemoteServer JLinkSTM32
 
 </PRE>
 
