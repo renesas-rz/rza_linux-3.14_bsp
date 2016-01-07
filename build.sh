@@ -12,6 +12,8 @@ function usage {
   echo -e "    ./build.sh librzjpeg               : RZ/A1 JPEG HW decode example application"
   echo -e "    ./build.sh axfs                    : Builds an AXFS image from the last Buildroot output"
   echo -e ""
+  echo -e "    ./build.sh env                     : Set up the Build environment so you can run 'make' directly"
+  echo -e ""
   echo -e "  You may also do things like:"
   echo -e "    ./build.sh kernel menuconfig       : Open the kernel config GUI to enable options/drivers"
   echo -e "    ./build.sh kernel rskrza1_xip_defconfig : Switch to XIP version of the kernel"
@@ -47,6 +49,18 @@ ROOTDIR=`pwd`
 # Check command line
 if [ "$1" == "" ] ; then
   usage
+  exit
+fi
+
+###############################################################################
+# env
+###############################################################################
+if [ "$1" == "env" ] ; then
+  echo "Copy/paste this line and execute it in your command window."
+  echo ""
+  echo 'export ROOTDIR=$(pwd) ; source ./setup_env.sh'
+  echo ""
+  echo "Then, you can execute 'make' directly in u-boot, linux, buildroot, etc..."
   exit
 fi
 
