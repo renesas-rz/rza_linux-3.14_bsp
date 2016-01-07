@@ -14,6 +14,8 @@ function usage {
   echo -e ""
   echo -e "    ./build.sh env                     : Set up the Build environment so you can run 'make' directly"
   echo -e ""
+  echo -e "    ./build.sh jlink                   : Downlaod a binary image to RAM so you can program it into QSPI"
+  echo -e ""
   echo -e "  You may also do things like:"
   echo -e "    ./build.sh kernel menuconfig       : Open the kernel config GUI to enable options/drivers"
   echo -e "    ./build.sh kernel rskrza1_xip_defconfig : Switch to XIP version of the kernel"
@@ -63,6 +65,140 @@ if [ "$1" == "env" ] ; then
   echo "Then, you can execute 'make' directly in u-boot, linux, buildroot, etc..."
   exit
 fi
+
+###############################################################################
+# jlink
+###############################################################################
+if [ "$1" == "jlink" ] ; then
+  echo "Download binary files to on-board RAM"
+
+  if [ "$2" == "" ] ; then
+    echo "
+usage: ./build.sh jlink {FILE} {ADDRESS}
+   FILE: The path to the file to download.
+ADDRESS: (Optional) Default is 0x08000000 (begining of SDRAM)
+
+Examples:
+  # u-boot
+  ./build.sh jlink output/u-boot-2015.01/u-boot.bin
+
+  # Device Tree Blob
+  ./build.sh jlink output/linux-3.14/arch/arm/boot/dts/r7s72100-rskrza1.dtb
+
+  # Kernel
+  ./build.sh jlink output/linux-3.14/arch/arm/boot/uImage
+  ./build.sh jlink output/linux-3.14/arch/arm/boot/xipImage
+
+  # Root File System
+  ./build.sh jlink output/buildroot-2014.05/output/images/rootfs.squashfs
+  ./build.sh jlink output/axfs/rootfs.axfs.bin
+
+NOTE: Your board should be up and running in u-boot first before executing this command.
+
+"
+    exit
+ fi
+
+  # File check
+  if [ ! -e "$2" ] ; then
+    echo "ERROR: File does not exist. $2"
+    exit
+  fi
+
+  filename=$(basename "$2")
+  extension="${filename##*.}"
+  #filename_only="${filename%.*}"
+
+  # Jlink must have a file extension of .bin for downloading
+  if [ "$extension" == "bin" ] ; then
+    dlfile=/tmp/$filename
+  else
+    dlfile=/tmp/$filename.bin
+  fi
+  cp -v "$2" $dlfile
+
+  ramaddr=$3
+  if [ "$ramaddr" == "" ] ; then
+    ramaddr="0x08000000"
+  fi
+
+  # Create a jlink script and execute it
+  echo "loadbin $dlfile,$ramaddr" > /tmp/jlink_load.txt
+  echo "g" >> /tmp/jlink_load.txt
+  echo "exit" >> /tmp/jlink_load.txt
+  JLinkExe -speed 15000 -if JTAG -device R7S721001 -CommanderScript /tmp/jlink_load.txt
+
+  echo "-----------------------------------------------------"
+  echo -en "\tFile size was:\n\t"
+  du -h $dlfile
+  echo "-----------------------------------------------------"
+
+FILESIZE=$(cat $dlfile | wc -c)
+
+  CHECK=$(echo $dlfile | grep u-boot)
+  if [ "$CHECK" != "" ] ; then
+  echo "Example program operations:
+
+# Rewrite u-boot (512 KB):
+=> sf probe 0 ; sf erase 0 80000 ; sf write $ramaddr 0 80000
+"
+  exit
+  fi
+
+  CHECK=$(echo $dlfile | grep dtbs)
+  if [ "$CHECK" != "" ] ; then
+  echo "Example program operations:
+
+# Program DTB (32 KB)
+=> sf probe 0 ; sf erase C0000 40000 ; sf write $ramaddr C0000 8000
+"
+  exit
+  fi
+
+  CHECK=$(echo $dlfile | grep Image)
+  if [ "$CHECK" != "" ] ; then
+  echo "Example program operations:
+
+# Program Kernel (5MB max, Dual SPI flash)
+=> sf probe 0:1 ; sf erase 100000 280000 ; sf write $ramaddr 100000 500000
+
+# Program Kernel (X MB size, Dual SPI Flash)
+=> set e_sz 280000 ; set w_sz 500000
+=> sf probe 0:1 ; sf erase 100000 \${e_sz} ; sf write $ramaddr 100000 \${e_sz}
+"
+  exit
+  fi
+
+  CHECK=$(echo $dlfile | grep rootfs)
+  if [ "$CHECK" != "" ] ; then
+  echo "Example program operations:
+
+"
+	# Program rootfs (Dual Flash memory)
+	if [ $FILESIZE -le $((0x400000)) ]; then	# <= 4MB?
+	  echo "Program Rootfs (4MB)
+  => sf probe 0:1 ; sf erase 00400000 200000 ; sf write $ramaddr 00400000 400000"
+	elif [ $FILESIZE -le $((0x600000)) ]; then	# <= 6MB?
+	  echo "Program Rootfs (6MB)
+  => sf probe 0:1 ; sf erase 00400000 300000 ; sf write $ramaddr 00400000 600000"
+	elif [ $FILESIZE -le $((0x800000))  ]; then	# <= 8MB?
+	  echo "Program Rootfs (8MB)
+  => sf probe 0:1 ; sf erase 00400000 400000 ; sf write $ramaddr 00400000 800000"
+	elif [ $FILESIZE -le $((0x800000))  ]; then	# <= 10MB?
+	  echo "Program Rootfs (10MB)
+  => sf probe 0:1 ; sf erase 00400000 500000 ; sf write $ramaddr 00400000 A00000"
+	elif [ $FILESIZE -le $((0x800000))  ]; then	# <= 12MB?
+	  echo "Program Rootfs (12MB)
+  => sf probe 0:1 ; sf erase 00400000 600000 ; sf write $ramaddr 00400000 C00000"
+	elif [ $FILESIZE -le $((0x800000))  ]; then	# <= 14MB?
+	  echo "Program Rootfs (14MB)
+  => sf probe 0:1 ; sf erase 00400000 700000 ; sf write $ramaddr 00400000 E00000"
+	fi
+  exit
+  fi
+
+fi
+
 
 # Run build environment setup
 if [ "$ENV_SET" != "1" ] ; then
