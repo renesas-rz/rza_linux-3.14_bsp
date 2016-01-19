@@ -145,7 +145,7 @@ FILESIZE=$(cat $dlfile | wc -c)
   exit
   fi
 
-  CHECK=$(echo $dlfile | grep dtbs)
+  CHECK=$(echo $dlfile | grep dtb)
   if [ "$CHECK" != "" ] ; then
   echo "Example program operations:
 
