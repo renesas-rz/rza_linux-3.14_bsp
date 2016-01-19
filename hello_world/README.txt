@@ -85,4 +85,62 @@ Step 3. Program the new file system into your board.
    Now when you boot your board, you should find your 'hello' executable
    under /root/bin
 
+Step 4. Download your application over the serial console
+
+	This is an alternative to re-flashing your SPI flash each time you
+	rebuild your application.
+
+	Even though file systems such as squashfs and axfs are read-only,
+	the /tmp directory on your target board will be RAM based, so
+	you can write files to it.
+
+	This section explains how you can send down a file using ZMODEM from
+	your host PC to your board using the current serial console connection.
+
+	* You will first need to add the package 'lrzsz' to both your host PC
+	  and target board file system.
+
+	(host)$ sudo apt-get install lrzsz
+
+	(rza1 bsp)$ ./build.sh buildroot menuconfig
+
+		Target packages  --->
+			Networking applications  --->
+				[*] lrzsz
+
+		Then rebuild your rootfs (./build.sh buildroot) and download
+		this new filesystem to your board (./build.sh jlink)
+
+	* Send a file from host to board. First, in the serial console terminal,
+	  change into a writeable directory such as /tmp. If you have something
+	  like an SD Card or USB stick mounted, you could use that a well. After
+	  you enter teh 'rz' command, your serial console will be unusable until
+	  the transfer is complete.
+
+		(rza1)$ cd /tmp
+		(rza1)$ rz -y
+
+	* Then on the host side, send the binary application file down.
+
+	[ Linux ]
+		* Open a terminal window other than what your console is in (since
+		it will become unusable after the "rz" command is executed).
+
+		* Change into the directory of your 'hello' application
+
+			(host)$ cd rskrza1_bsp/hello_world
+
+		* Send the file using ZMODEM directly to the RZ/A1 RSK serial
+		  driver (/dev/ttyACM0)
+
+			(host)$ sz -b hello > /dev/ttyACM0 < /dev/ttyACM0
+
+	[ Windows TeraTerm ]
+		If you are using TeraTerm in Windows for your serial console
+		communications, TeraTerm has ZMODEM functionality built in.
+
+			File >> Transfer >> ZMODEM >> Send...
+
+		NOTE: When using TeraTerm, you will have to change the file
+		permissions to add executable again after download (chmod +x hello)
 
