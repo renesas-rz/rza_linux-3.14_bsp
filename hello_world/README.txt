@@ -144,3 +144,18 @@ Step 4. Download your application over the serial console
 		NOTE: When using TeraTerm, you will have to change the file
 		permissions to add executable again after download (chmod +x hello)
 
+
+	* Receiving Files
+	If you want to send a file from your board to the PC, you only need to
+	enter the following command if you are using minicom on your Linux PC:
+
+		(rza1)$ sz -b file-to-send
+
+	The file will automatically be sent to the PC and show up in your user home
+	direcotry ( ~/ ).
+			(host)$ ls -l ~/file-to-send
+
+	Note that if you do not remove that file from your home directory and you
+	send another file with the same name, minicom will not overwrite the file,
+	but instead append a .0 on the end of the filename.
+
