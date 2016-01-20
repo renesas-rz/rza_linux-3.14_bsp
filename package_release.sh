@@ -1,6 +1,6 @@
 #!/bin/bash
 
-NAME=RSKRZA1-BSP-V1.1.1
+NAME=RSKRZA1-BSP-V1.2.0
 TMP=/tmp/$NAME
 
 CUR_DIR=$(pwd)

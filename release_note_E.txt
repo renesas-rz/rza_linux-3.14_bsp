@@ -1,8 +1,8 @@
 RZ/A1H Linux BSP Release Note
 
 =============================================================
-Release V.1.1.1
-April 2015
+Release V.1.2.0
+January 2016
 Renesas Electronics America Corporation
 
 = NOTIFICATION
@@ -75,4 +75,18 @@ Release V.1.1.0
 Release V.1.1.1
 - May 2015
 - Download u-boot from FTP server instead of HTTP server
+
+Release V.1.2.0
+- January 2016
+- Add Micron SPI flash support to u-boot
+- Move pin and SDRAM setup in u-boot from assembly code to C code
+- Add Ethernet to default XIP kernel build
+- Fix loadable modules bug for XIP Linux
+- Fix touchscreen false errors
+- Fix audio static sound bug
+- Add LVDS LCD example for RSK
+- Clean up board-rskrza1.c file to make easier for board porting
+- Add Hello World application example with build instructions
+- Add source for mem application
+- Add jlink download command to build.sh
 
