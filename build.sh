@@ -54,6 +54,14 @@ if [ "$1" == "" ] ; then
   exit
 fi
 
+# Find out how many CPU processor cores we have on this machine
+# so we can build faster by using multithreaded builds
+NPROC=2
+if [ "$(which nproc)" != "" ] ; then  # make sure nproc is installed
+  NPROC=$(nproc)
+fi
+BUILD_THREADS=$(expr $NPROC + $NPROC)
+
 ###############################################################################
 # env
 ###############################################################################
@@ -323,8 +331,8 @@ if [ "$1" == "kernel" ] ; then
   if [ "$IMG_BUILD" == "1" ] ; then
     # NOTE: We have to make the Device Tree Blobs too, so we'll add 'dtbs' to
     #       the command line
-    echo -e "make -j4 $2 dtbs\n"
-    make -j4 $2 dtbs
+    echo -e "make -j$BUILD_THREADS $2 dtbs\n"
+    make -j$BUILD_THREADS $2 dtbs
 
     if [ ! -e vmlinux ] ; then
       # did not build, so exit
@@ -336,8 +344,8 @@ if [ "$1" == "kernel" ] ; then
   else
       # user wants to build something special
       banner_yellow "Custom Build"
-      echo -e "make -j4 $2 $3 $4\n"
-      make -j4 $2 $3 $4
+      echo -e "make -j$BUILD_THREADS $2 $3 $4\n"
+      make -j$BUILD_THREADS $2 $3 $4
   fi
 
   cd $ROOTDIR
