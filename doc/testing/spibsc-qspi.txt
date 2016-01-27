@@ -2,7 +2,12 @@
              Bus: SPIBSC channel 1
      Device Addr: 
 Required package: mtd-utils 1.5.1
-    In Buildroot: Yes (menuconfig > > Target packages > Filesystem and flash utilities > mtd, jffs2 and ubi/ubifs tools > flash_erase)
+    In Buildroot: Yes
+
+Buildroot menuconfig changes:
+	Target packages ->
+		Filesystem and flash utilities ->
+			[*] mtd, jffs2 and ubi/ubifs tools
 
 
 $ cat /proc/mtd
@@ -79,8 +84,63 @@ $ hexdump /dev/mtdblock7 -n64 -C
 00000030  30 30 20 72 6f 6f 74 3d  2f 64 65 76 2f 6e 66 73  |00 root=/dev/nfs|
 00000040
 
+---------------------------------
+JFFS2 R/W file system example
+---------------------------------
+Step 1: Add JFFS image to Buildroot
+
+	# menuconfig
+	(rskrza1_bsp)$ ./build.sh buildroot menuconfig
+
+	Filesystem images ->
+		[*] jffs2 root filesystem
+		     Flash Type (Select custom page and erase size)  --->
+		(0x100) Page Size
+		(0x40000) Erase block size
 
 
+	# Rebuild rootfs
+	(rskrtza1_bsp)$ ./build.sh buildroot
 
+
+Step 2: Add JFFS2 support to kernel
+
+	# Kernel menuconfig
+	(rskrtza1_bsp)$ ./build.sh kernel menuconfig
+
+	CONFIG_JFFS2_FS=y
+
+	File systems >
+		Miscellaneous filesystems >
+	  		<*> Journalling Flash File System v2 (JFFS2) support
+
+Step 3: Program JFFS image into single QSPI
+
+	# Pre-fill 10MB of SDRAM area (where you will download to) with 0xFF
+	# Otherwise, JFFS2 will think it is corrupted blocks
+	=> mw.b 08000000 0xFF A00000
+
+	# Download JFFS2 to SDRAM
+	(rskrza1_bsp)$ ./build.sh jlink output/buildroot-2014.05/output/images/rootfs.jffs2
+
+	# Program 10MB JFFS image (rootfs.jffs2 + 0xFFs) into single QSPI (from SDRAM)
+	=> sf probe 0 ; sf erase 00800000 A00000 ; sf write 08000000 00800000 A00000
+
+Step 4: Kernel Boot
+	# Download uImage (0x09000000) and DTBS (0x09800000) to SDRAM
+	(rskrza1_bsp)$ ./build.sh jlink output/linux-3.14/arch/arm/boot/uImage 0x09000000
+	(rskrza1_bsp)$ ./build.sh jlink output/linux-3.14/arch/arm/boot/dts/r7s72100-rskrza1.dtb 0x09800000
+
+	# Kernel Boot:
+	=> setenv j1 'bootm start 0x09000000 - 0x09800000 ; bootm loados'
+	=> setenv jbootargs 'console=ttySC2,115200 ignoreloglevel console=tty0 root=/dev/mtdblock9 ro rootfstype=jffs2'
+	=> setenv jbootargs 'console=ttySC2,115200 ignoreloglevel console=tty0 root=/dev/mtdblock9'
+	=> setenv jboot 'run j1; setenv bootargs ${jbootargs}; fdt chosen; bootm go'
+	=> save
+	=> run jboot
+
+	NOTE: After mounting the rootfs, the JFFS2 driver will scan every erase sector
+	looking for headers, so you'll see the system just sit there for a couple seconds
+	before it finally gives you a login prompt.
 
 
