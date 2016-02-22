@@ -328,6 +328,14 @@ $ cd output/u-boot-2015.01
 $ git pull
 $ cd ../..
 
+
+NOTE: Even though github has a valid SSL certificate, some have mentioned that
+git doesn't resolve it correctly. If you cannot git clone correctly, you might
+want to try adding "env GIT_SSL_NO_VERIFY=true" before git clone.
+
+Example: 
+$ env GIT_SSL_NO_VERIFY=true git clone https://github.com/renesas-rz/rskrza1_bsp.git
+
 </PRE>
 
 
