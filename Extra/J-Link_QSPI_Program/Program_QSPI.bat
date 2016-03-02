@@ -1,8 +1,9 @@
 @echo off
 
 rem <> Manually set path to JLink install directory here if you do not
-rem    want to use the auto detect method
-set BASE=C:\Program Files (x86)\SEGGER\JLink_V488b
+rem    want to use the auto detect method. Make sure a backslash
+rem    is at the end of the path
+set BASE=C:\Program Files (x86)\SEGGER\JLink_V500k\
 if exist "%BASE%\JLink.exe" goto PATH_SET
 
 rem <> Try to automatically detect JLink install directory
@@ -27,6 +28,30 @@ pause
 chgclr 07
 exit
 :PATH_SET
+
+rem <> extract the version number from the path
+set MINJVER=V500j
+set JVER=%BASE:~-6%
+set JVER=%JVER:~0,-1%
+rem Remove '_' if present
+set JVER=%JVER:_V=V%
+echo Your JLINK Version is %JVER%
+echo Minimum JLINK Version is %MINJVER%
+echo.
+if /I %JVER% GEQ %MINJVER% (goto JTAGCONF_CHECK)
+chgclr 0C
+echo ===================================================================
+echo ERROR: You need at least JLINK verison %MINJVER%
+echo ===================================================================
+pause
+chgclr 07
+exit
+
+:JTAGCONF_CHECK
+rem <> After version 5.10, a new command line option is needed
+set JTAGCONFVER=V510
+set JTAGCONF=
+if /I %JVER% GEQ %JTAGCONFVER% (set JTAGCONF=-jtagconf -1,-1)
 
 echo.
 :OPTIONS
@@ -88,32 +113,32 @@ GOTO PROG_DONE
 
 @REM =====u-boot========
 :UBOOT
-"%BASE%\JLink.exe" -speed 15000 -if JTAG -device R7S721001 -CommanderScript load_spi_uboot.txt
+"%BASE%\JLink.exe" -speed 15000 -if JTAG %JTAGCONF% -device R7S721001 -CommanderScript load_spi_uboot.txt
 GOTO PROG_DONE
 
 @REM =====Device Tree Blob========
 :DTB
-"%BASE%\JLink.exe" -speed 15000 -if JTAG -device R7S721001 -CommanderScript load_spi_dtb.txt
+"%BASE%\JLink.exe" -speed 15000 -if JTAG %JTAGCONF% -device R7S721001 -CommanderScript load_spi_dtb.txt
 GOTO PROG_DONE
 
 @REM =====Kernel (uImage)========
 :KERNEL_UIMAGE
-"%BASE%\JLink.exe" -speed 15000 -if JTAG -device R7S721001_DualSPI -CommanderScript load_spi_kernel_uImage.txt
+"%BASE%\JLink.exe" -speed 15000 -if JTAG %JTAGCONF% -device R7S721001_DualSPI -CommanderScript load_spi_kernel_uImage.txt
 GOTO PROG_DONE
 
 @REM =====Kernel (xipImage)========
 :KERNEL_XIP
-"%BASE%\JLink.exe" -speed 15000 -if JTAG -device R7S721001_DualSPI -CommanderScript load_spi_kernel_xipImage.txt
+"%BASE%\JLink.exe" -speed 15000 -if JTAG %JTAGCONF% -device R7S721001_DualSPI -CommanderScript load_spi_kernel_xipImage.txt
 GOTO PROG_DONE
 
 @REM =====Rootfs (squashfs)========
 :ROOTFS_SQUASHFS
-"%BASE%\JLink.exe" -speed 15000 -if JTAG -device R7S721001_DualSPI -CommanderScript load_spi_rootfs_squashfs.txt
+"%BASE%\JLink.exe" -speed 15000 -if JTAG %JTAGCONF% -device R7S721001_DualSPI -CommanderScript load_spi_rootfs_squashfs.txt
 GOTO PROG_DONE
 
 @REM =====Rootfs (axfs)========
 :ROOTFS_AXFS
-"%BASE%\JLink.exe" -speed 15000 -if JTAG -device R7S721001_DualSPI -CommanderScript load_spi_rootfs_axfs.txt
+"%BASE%\JLink.exe" -speed 15000 -if JTAG %JTAGCONF% -device R7S721001_DualSPI -CommanderScript load_spi_rootfs_axfs.txt
 GOTO PROG_DONE
 
 :PROG_DONE

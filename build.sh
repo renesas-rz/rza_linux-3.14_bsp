@@ -134,7 +134,20 @@ NOTE: Your board should be up and running in u-boot first before executing this 
   echo "loadbin $dlfile,$ramaddr" > /tmp/jlink_load.txt
   echo "g" >> /tmp/jlink_load.txt
   echo "exit" >> /tmp/jlink_load.txt
-  JLinkExe -speed 15000 -if JTAG -device R7S721001 -CommanderScript /tmp/jlink_load.txt
+
+  # After version 5.10, a new command line option is needed
+  CHECK=`which JLinkExe`
+  JLINKPATH=$(readlink -f $CHECK | sed 's:/JLinkExe::')
+  JLINKVER=$(ls $JLINKPATH/libjlinkarm.so.5.* | sed "s:$JLINKPATH/libjlinkarm.so.::")
+  # Since version numbers are not really 'numbers', we'll use 'sort' to figure
+  # out what one is the smallest, and if 5.10 is still the first number in the list,
+  # then we know the current version is either the same or later
+  ORDER=$(echo -e "5.10\\n$JLINKVER" | sort -V)
+  if [ "${ORDER:0:4}" == "5.10" ] ; then
+    JTAGCONF='-jtagconf -1,-1'
+  fi
+
+  JLinkExe -speed 15000 -if JTAG $JTAGCONF -device R7S721001 -CommanderScript /tmp/jlink_load.txt
 
   echo "-----------------------------------------------------"
   echo -en "\tFile size was:\n\t"
