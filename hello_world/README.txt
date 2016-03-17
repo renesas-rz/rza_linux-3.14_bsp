@@ -126,6 +126,21 @@ Step 4. Download your application over the serial console
 		* Open a terminal window other than what your console is in (since
 		it will become unusable after the "rz" command is executed).
 
+		* You can use the application minicom to do this:
+		$ minicom -D /dev/ttyACM0 -b 115200
+
+		* !!NOTE!! By default, the "/dev/ttyACM0" device will be owned by "root"
+		  and part of the group "dialout".
+			(host)$ ls -l /dev/ttyACM0
+			crw-rw---- 1 root dialout 166, 0 Mar 16 14:24 /dev/ttyACM0
+		  Therefore, if you try to connect with minicom and you get a "permission denied",
+		  error because your user account is not part of the dialout group.
+		  Use the following command to add yourself to the dialout group:
+
+			(host)$ sudo usermod -a -G dialout $(id -un)
+			NOW, YOU MUST EITHER REBOOT or LOG OUT AND LOG BACK IN
+
+
 		* Change into the directory of your 'hello' application
 
 			(host)$ cd rskrza1_bsp/hello_world
