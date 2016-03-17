@@ -30,7 +30,9 @@ echo "Copying directories..."
 cp -a axfs $TMP
 cp -a doc $TMP
 cp -a Extra $TMP
+cp -a hello_world $TMP
 cp -a librzjpeg $TMP
+cp -a mem $TMP
 cp -a patches-buildroot $TMP
 cp -a patches-kernel $TMP
 cp -a patches-uboot $TMP
