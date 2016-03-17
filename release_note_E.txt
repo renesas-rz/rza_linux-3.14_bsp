@@ -1,8 +1,8 @@
 RZ/A1H Linux BSP Release Note
 
 =============================================================
-Release V.1.2.0
-January 2016
+Release V.1.2.1
+March 2016
 Renesas Electronics America Corporation
 
 = NOTIFICATION
@@ -89,4 +89,10 @@ Release V.1.2.0
 - Add Hello World application example with build instructions
 - Add source for mem application
 - Add jlink download command to build.sh
+
+Release V.1.2.1
+- March 2016
+- Add hello_world and mem examples...for real this time (they were not being packaged with the 1.2.0 release)
+- Add JFFS2 example
+- Add support for JLINK SW version 5.10+
 
