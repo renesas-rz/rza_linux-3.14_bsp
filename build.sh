@@ -184,8 +184,8 @@ FILESIZE=$(cat $dlfile | wc -c)
 => sf probe 0:1 ; sf erase 100000 280000 ; sf write $ramaddr 100000 500000
 
 # Program Kernel (X MB size, Dual SPI Flash)
-=> set e_sz 280000 ; set w_sz 500000
-=> sf probe 0:1 ; sf erase 100000 \${e_sz} ; sf write $ramaddr 100000 \${e_sz}
+=> setenv e_sz 280000 ; setenv w_sz 500000
+=> sf probe 0:1 ; sf erase 100000 \${e_sz} ; sf write $ramaddr 100000 \${w_sz}
 "
   exit
   fi
