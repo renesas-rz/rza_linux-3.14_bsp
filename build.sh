@@ -205,13 +205,13 @@ FILESIZE=$(cat $dlfile | wc -c)
 	elif [ $FILESIZE -le $((0x800000))  ]; then	# <= 8MB?
 	  echo "Program Rootfs (8MB)
   => sf probe 0:1 ; sf erase 00400000 400000 ; sf write $ramaddr 00400000 800000"
-	elif [ $FILESIZE -le $((0x800000))  ]; then	# <= 10MB?
+	elif [ $FILESIZE -le $((0xA00000))  ]; then	# <= 10MB?
 	  echo "Program Rootfs (10MB)
   => sf probe 0:1 ; sf erase 00400000 500000 ; sf write $ramaddr 00400000 A00000"
-	elif [ $FILESIZE -le $((0x800000))  ]; then	# <= 12MB?
+	elif [ $FILESIZE -le $((0xC00000))  ]; then	# <= 12MB?
 	  echo "Program Rootfs (12MB)
   => sf probe 0:1 ; sf erase 00400000 600000 ; sf write $ramaddr 00400000 C00000"
-	elif [ $FILESIZE -le $((0x800000))  ]; then	# <= 14MB?
+	elif [ $FILESIZE -le $((0xE00000))  ]; then	# <= 14MB?
 	  echo "Program Rootfs (14MB)
   => sf probe 0:1 ; sf erase 00400000 700000 ; sf write $ramaddr 00400000 E00000"
 	fi
