@@ -126,6 +126,9 @@ Step 3: Program JFFS image into single QSPI
 	# Program 10MB JFFS image (rootfs.jffs2 + 0xFFs) into single QSPI (from SDRAM)
 	=> sf probe 0 ; sf erase 00800000 A00000 ; sf write 08000000 00800000 A00000
 
+	# Erase all flash after jffs2 image from address 18M (0x01200000 to 64M(0x04000000)
+	=> sf probe 0 ; sf erase 01200000 02E00000
+
 Step 4: Kernel Boot
 	# Download uImage (0x09000000) and DTBS (0x09800000) to SDRAM
 	(rskrza1_bsp)$ ./build.sh jlink output/linux-3.14/arch/arm/boot/uImage 0x09000000
@@ -133,8 +136,7 @@ Step 4: Kernel Boot
 
 	# Kernel Boot:
 	=> setenv j1 'bootm start 0x09000000 - 0x09800000 ; bootm loados'
-	=> setenv jbootargs 'console=ttySC2,115200 ignoreloglevel console=tty0 root=/dev/mtdblock9 ro rootfstype=jffs2'
-	=> setenv jbootargs 'console=ttySC2,115200 ignoreloglevel console=tty0 root=/dev/mtdblock9'
+	=> setenv jbootargs 'console=ttySC2,115200 ignoreloglevel console=tty0 root=/dev/mtdblock9 rw rootfstype=jffs2'
 	=> setenv jboot 'run j1; setenv bootargs ${jbootargs}; fdt chosen; bootm go'
 	=> save
 	=> run jboot
@@ -142,5 +144,31 @@ Step 4: Kernel Boot
 	NOTE: After mounting the rootfs, the JFFS2 driver will scan every erase sector
 	looking for headers, so you'll see the system just sit there for a couple seconds
 	before it finally gives you a login prompt.
+
+Step 5: Programming kernel into single QSPI
+	# Instead of downloading the kernel to RAM usign JLINK, you can use these
+	  steps to program the kernel and DTBS into single QSPI Flash.
+
+	(rskrza1_bsp)$ ./build.sh jlink output/linux-3.14/arch/arm/boot/dts/r7s72100-rskrza1.dtb 0x09800000
+	(uboot) => sf probe 0 ; sf erase C0000 40000 ; sf write 0x09800000 C0000 40000
+
+	(rskrza1_bsp)$ ./build.sh jlink output/linux-3.14/arch/arm/boot/uImage 0x09000000
+	(uboot) => sf probe 0 ; sf erase 100000 500000 ; sf write 0x09000000 100000 500000
+
+	# Now, to boot the kernel:
+	=> setenv j1 'sf probe 0 ; sf read 0x09800000 C0000 40000 ; sf read 0x09000000 100000 500000'
+	=> setenv j2 'bootm start 0x09000000 - 0x09800000 ; bootm loados'
+	=> setenv jbootargs 'console=ttySC2,115200 ignoreloglevel console=tty0 root=/dev/mtdblock9 rw rootfstype=jffs2'
+	=> setenv jboot 'run j1 j2; setenv bootargs ${jbootargs}; fdt chosen; bootm go'
+	=> save
+	=> run jboot
+
+
+NOTES:
+	- If you mount your JFFS2 file system as R/W, after every command, busybox will update the file /root/.ash_history which
+	will result in 2 page write commands being sent to the SPI flash. To avoid this, simple execute this command which
+	will make .ash_history a pointer to a RAM based file intead (as in, no more SPI flash writes after each command)
+		$ rm .ash_history ; ln -s /tmp/ash_history .ash_history
+
 
 
