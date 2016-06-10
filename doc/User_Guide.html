@@ -5,7 +5,7 @@
 <BODY>
 <H1> RZ/A1 Linux BSP</H1>
 
-If this is the first time usign the BSP, please follow the below sections in order.
+If this is the first time using the BSP, please follow the below sections in order.
 
 <H2>Table of Contents</H2>
 <LI> Section 1: <A href="#S1"> Modifying the RSK board (V1 and V2 boards)</A>
@@ -29,12 +29,12 @@ If your board is labeled as a "V1" or "V2", then these modifications are needed.
 ================================================
 ENABLE ETHERNET
 ================================================
-To use Ethernet, RSK+RZA1H board configuration must be changed  by modifying link registers.
+To use Ethernet, RSK+RZA1H board configuration must be changed by modifying link registers.
 
 	R104 : Fit -> Remove
 	R105 : Remove -> Fit
 
-Please refer to [6.1.8 Ethernet] of "RZ/A1H Group Renesas Starter Kit+  User's Manual For DS-5" for details. 
+Please refer to [6.1.8 Ethernet] of "RZ/A1H Group Renesas Starter Kit+ User's Manual For DS-5" for details. 
 
 The two resistors are right on the corner of the RZ chip between the silk screen text for IC1 and a Tantalum capacitor next to silk screen marking for IC20. 
 
@@ -140,7 +140,7 @@ are programming scripts to program binary images that you build into on-board se
 flash (Dual SQPI).
 
 Simply copy the resulting binaries from your builds into this directory and rename
-them to end in ".bin" (overwritting the existing ones).
+them to end in ".bin" (overwriting the existing ones).
 
 The individual binaries from the build.sh process can be found at these locations:
 
@@ -190,7 +190,7 @@ having to power cycle between each program session.
 Serial Port Setup
 
 You will need a serial port connection between the board and the PC.
-The RSK board has an USB-to_Serial device already mounted, so you only need
+The RSK board has an USB-to-Serial device already mounted, so you only need
 to connect the USB cable that comes with the kit to between connector CN18 and
 your PC.
 
@@ -207,11 +207,11 @@ It should show up as /dev/ttyACM0. Therefore, you can use it like:
 
 	$ minicom -D /dev/ttyACM0 -b 115200
 
-	NOTE: minicom is not pre-installed, so you ahve to do a 'apt-get install minicom'
+	NOTE: minicom is not pre-installed, so you have to do a 'apt-get install minicom'
 	NOTE: To close minicom, press Ctrl+A, then 'q'
 
 Windows:
-While windows nativly suports a CDC class driver, you will need to point it
+While windows natively supports a CDC class driver, you will need to point it
 to a .INF file. That INF file comes on the RZ/A1 RSK CD.
 You can also find it in the BSP in the "Extra" directory.
 </PRE>
@@ -305,7 +305,7 @@ File system login will be "root" (no password)
 <PRE>
 In between BSP releases, new features and bug fixes are applied and checked into
 a public github account. If you would like to set up your BSP build environment so
-that you can easily retrive the lastest u-boot and kernel, follow these instructions.
+that you can easily retrieve the latest u-boot and kernel, follow these instructions.
 
 
 $ git clone https://github.com/renesas-rz/rskrza1_bsp.git
