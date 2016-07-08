@@ -201,6 +201,13 @@ CONFIG_TOUCHSCREEN_FT5X06_SINGLE_TOUCH
 			[*] Focaltech FT5X06 5 point touchscreen
 			[*]     FT5X06 touchscreen as single-touch
 
+  NOTE: For your touchscreen to show up as /dev/input/event for applications to use,
+        you will need to also enable the event interface (CONFIG_INPUT_EVDEV) in the kernel.
+	> Device Drivers
+		> Input device support
+			<*>   Event interface
+
+
 NOR Flash
 ---------------------------------------------------
 CONFIG_MTD_CFI=y
