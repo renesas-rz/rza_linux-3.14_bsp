@@ -26,6 +26,26 @@ export PATH=${TOOLCHAIN_DIR}/bin:$PATH
 export CROSS_COMPILE="arm-linux-gnueabihf-"
 export ARCH=arm
 
+# -------------------------------------------------
+# Change prompt to inform the BSP env has been set
+# -------------------------------------------------
+# Uncomment the prompt you want
+
+# Change prompt to (rza1_bsp)
+#PS1="(rza1_bsp)$ "
+
+# Change prompt to (rza1_bsp) with RED text
+#PS1="\[\e[1;31m\](rza1_bsp)$\[\e[00m\] "
+
+# Change prompt to (rza1_bsp) with RED text
+# with current directory printed out on the line above
+#PS1="dir: \w\n\[\e[1;31m\](rza1_bsp)$\[\e[00m\] "
+
+# Change prompt to (rza1_bsp) with RED text
+# with current directory printed out on the line above in ORANGE text
+PS1="\[\e[33m\]dir: \w\n\[\e[1;31m\](rza1_bsp)$\[\e[00m\] "
+
+
 echo "Build Environment set"
 export ENV_SET=1
 
