@@ -8,7 +8,7 @@
 If this is the first time using the BSP, please follow the below sections in order.
 
 <H2>Table of Contents</H2>
-<LI> Section 1: <A href="#S1"> Modifying the RSK board (V1 and V2 boards)</A>
+<LI> Section 1: <A href="#S1"> Modifying the RSK board</A>
 <LI> Section 2: <A href="#S2"> Make sure your PC has the software it needs to build</A>
 <LI> Section 3: <A href="#S3"> Building</A>
 <LI> Section 4: <A href="#S4"> How to use the SEGGER JLINK Lite that comes with the RSK to program your board</A>
@@ -21,10 +21,19 @@ If this is the first time using the BSP, please follow the below sections in ord
 
 <!---------------------------------------------------------------------------->
 <A NAME="S1">
-<H2> Section 1: Modifying the RSK board (V1 and V2 boards)</H2>
+<H2> Section 1: Modifying the RSK board</H2>
 <PRE>
-NOTE!!
-If your board is labeled as a "V1" or "V2", then these modifications are needed.
+
+Each board has a white label sticker on the top.
+The label will say something like:
+
+    D012221#04
+    RSK+RZA1 - V2
+    YR0K77210C000BE
+
+If your board has a "RSK+RZA1 - V2" and "D012221#04", then these modifications have already been applied during board manufacturing.
+
+If your board has a "- V1" or "#03", then your board requires these modifications below.
 
 ================================================
 ENABLE ETHERNET
