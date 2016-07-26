@@ -1,0 +1,86 @@
+To enable OSTM kernel, set CONFIG_CLKSRC_SH_OSTM=y in the kernel configuration (menuconfig):
+
+  -> Device Drivers
+    [*] Renesas OSTM timer driver
+
+Optionally, you can enable "Idle dynticks system" (CONFIG_NO_HZ_IDLE) and/or "High Resolution Timer Suport" (CONFIG_HIGH_RES_TIMERS).  Please refer to "Documentation/timers/hrtimers.txt" included in kernel source code about these functions. 
+
+  General setup  --->
+    Timers subsystem  --->
+          Timer tick handling (Idle dynticks system (tickless idle))  --->
+      [ ] Old Idle dynticks config
+      [*] High Resolution Timer Support
+
+-----------------------------
+nanosleep.c Example
+-----------------------------
+
+Included file "nanosleep.c" is a sample program to use nanosleep (high resolution sleep) system call. 
+
+This sample program calls nanosleep system call to wait execution for 1 micro-second 20 times, and measures actual execution time for each call. 
+
+You can see the result of nanosleep as follows:
+    (a) BSP without OSTM driver
+    (b) BSP + OSTM driver enabled
+    (c) BSP + OSTM driver enabled + 
+            "Idle dynticks system" and 
+            "High Resolution Timer Suport" enabled
+
+In case of (a), system timer accuracy is 128Hz (7.8 ms). 
+It takes about 7.8 ms for each nanosleep call. 
+
+In case of (b), system timer accuracy is 33MHz (30 ns). 
+It takes about 7.8 ms for each nanosleep call. 
+Comparing with (a), since the measurement accuracy is high, the values vary little by little. 
+
+In case of (c), system timer accuracy is 33MHz (30 ns). 
+It takes about 84 to 244 us for each nanosleep call. 
+The kernel becomes to use high-resolution timer for its event handling. 
+
+
+---------------------------------------
+Accessing OSTM Timer register directly
+---------------------------------------
+
+All time stamps in an application may be derived from the OSTM timer directly. First, the kernel is built with OSTM enabled (CONFIG_CLKSRC_SH_OSTM=y), then the current count is read directly. Below sample code for accessing the OSTM timer counter register directly. This code might be usefull if you want to measure the difference in time of some operation in your application and you want it to be very accurate.
+
+void *ostm_base_addr, *ctr_base_addr;
+int InitOSTM(void)
+{
+    /* Open /dev/mem */
+    fd_mem = open("/dev/mem", O_RDWR);
+    if (fd_mem == -1)
+    {
+        LOG_E("can't open /dev/mem\n");
+        goto done;
+    }
+    /* Map in our OSTM Registers */
+    ostm_base_addr = mmap(NULL, OSTM_SIZE, PROT_READ | PROT_WRITE, MAP_SHARED, fd_mem, OSTM_BASE);
+    if (ostm_base_addr == MAP_FAILED)
+    {
+        LOG_E("mmap for /dev/mem failed\n");
+        goto done;
+    }
+    ctr_base_addr = ostm_base_addr + 4;
+
+    return 0;
+
+done :
+    if(fd_mem)
+        close(fd_mem);
+    return -1;
+}
+
+unsigned int GetTicks(void)
+{
+    unsigned int ticks;
+    ticks = *((volatile unsigned int *)ctr_base_addr);
+    return ticks;
+}
+
+
+
+
+
+
+
