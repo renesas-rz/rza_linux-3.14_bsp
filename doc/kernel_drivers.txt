@@ -46,6 +46,10 @@ CONFIG_USB_R8A66597_HCD
 		> USB support
 			[*] R8A66597 HCD support 
 
+NOTE: If you want to read a USB flash drive, you will also need:
+	CONFIG_SCSI
+	CONFIG_BLK_DEV_SD
+	CONFIG_USB_STORAGE
 
 
 USB Function
@@ -56,11 +60,6 @@ CONFIG_USB_R8A66597
 		> USB Gadget Support
 			> USB Peripheral Controller
 				[*] Renesas R8A66597 USB Peripheral Controller
-
-NOTE: If you want to read a USB flash driver, you will also need:
-	CONFIG_SCSI
-	CONFIG_BLK_DEV_SD
-	CONFIG_USB_STORAGE
 
 
 DMA
