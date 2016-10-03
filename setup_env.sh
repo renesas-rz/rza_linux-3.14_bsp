@@ -5,26 +5,39 @@
 # When calling this script, an enviroment variable 'ROOTDIR' must be set
 # to contain a full path.
 if [ "$ROOTDIR" == "" ]; then
-  echo -e "
+  echo -e '
 ERROR: You must set ROOTDIR before calling this file.
    If you want to use this file without build.sh, then
    you could pass it on the same line like:
 
       $ export ROOTDIR=$(pwd) ; source ./setup_env.sh
 
-"
+'
   exit
 fi
 
 # Settings
 export OUTDIR=${ROOTDIR}/output
-export TOOLCHAIN_DIR=$OUTDIR/gcc-linaro-arm-linux-gnueabihf-4.8-2014.02_linux
-export BUILDROOT_DIR=$OUTDIR/buildroot-2014.05
 
+# Buildroot directory
+if [ -e $OUTDIR/br_version.txt ] ; then
+  source $OUTDIR/br_version.txt
+fi
+export BUILDROOT_DIR=$OUTDIR/buildroot-$BR_VERSION
 
-export PATH=${TOOLCHAIN_DIR}/bin:$PATH
-export CROSS_COMPILE="arm-linux-gnueabihf-"
-export ARCH=arm
+# Toolchain directory (for u-boot and kernel)
+if [ -e $OUTDIR/buildroot-$BR_VERSION/output/host ] ; then
+
+  export TOOLCHAIN_DIR=$OUTDIR/host/usr
+
+  # set toolchain prefix and add to path
+  cd $OUTDIR/buildroot-$BR_VERSION/output/host/usr/bin
+  export CROSS_COMPILE=`ls *gcc | sed 's/gcc//'`
+  export PATH=`pwd`:$PATH
+  cd -
+  export ARCH=arm
+fi
+
 
 # -------------------------------------------------
 # Change prompt to inform the BSP env has been set

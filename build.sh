@@ -5,11 +5,9 @@ function usage {
   echo -ne "\033[1;31m" # RED TEXT
   echo -e "\nWhat do you want to build?"
   echo -ne "\033[00m" # END TEXT COLOR
-  echo -e "    ./build.sh get_toolchain           : Downloads pre-built Linaro toolchain for ARM"
-  echo -e "    ./build.sh kernel                  : Builds Linux kernel. Default is to build uImage"
+  echo -e "    ./build.sh buildroot               : Builds Root File System (and installs toolchain)"
   echo -e "    ./build.sh u-boot                  : Builds u-boot"
-  echo -e "    ./build.sh buildroot               : Builds Root File System"
-  echo -e "    ./build.sh librzjpeg               : RZ/A1 JPEG HW decode example application"
+  echo -e "    ./build.sh kernel                  : Builds Linux kernel. Default is to build uImage"
   echo -e "    ./build.sh axfs                    : Builds an AXFS image from the last Buildroot output"
   echo -e ""
   echo -e "    ./build.sh env                     : Set up the Build environment so you can run 'make' directly"
@@ -40,6 +38,20 @@ function banner_green {
   echo -ne "\033[00m"
 }
 
+##### Check if toolchain is installed correctly #####
+function check_for_toolchain {
+  CHECK=$(which ${CROSS_COMPILE}gcc)
+  if [ "$CHECK" == "" ] ; then
+    # Toolchain was found in path, so maybe it was hard coded in setup_env.sh
+    return
+  fi
+  if [ ! -e $OUTDIR/br_version.txt ] ; then
+    banner_red "Toolchain not installed yet."
+    echo -e "Buildroot will download and install the toolchain."
+    echo -e "Plesae run \"./build.sh buildroot\" first and select the toolchain you would like to use."
+    exit
+  fi
+}
 
 ###############################################################################
 # script start
@@ -54,6 +66,12 @@ if [ "$1" == "" ] ; then
   exit
 fi
 
+# Run build environment setup
+if [ "$ENV_SET" != "1" ] ; then
+  # Because we are using 'source', ROOTDIR can be seen in setup_env.sh
+  source ./setup_env.sh
+fi
+
 # Find out how many CPU processor cores we have on this machine
 # so we can build faster by using multithreaded builds
 NPROC=2
@@ -66,6 +84,9 @@ BUILD_THREADS=$(expr $NPROC + $NPROC)
 # env
 ###############################################################################
 if [ "$1" == "env" ] ; then
+
+  check_for_toolchain
+
   echo "Copy/paste this line and execute it in your command window."
   echo ""
   echo 'export ROOTDIR=$(pwd) ; source ./setup_env.sh'
@@ -98,7 +119,7 @@ Examples:
   ./build.sh jlink output/linux-3.14/arch/arm/boot/xipImage
 
   # Root File System
-  ./build.sh jlink output/buildroot-2014.05/output/images/rootfs.squashfs
+  ./build.sh jlink output/buildroot-$BR_VERSION/output/images/rootfs.squashfs
   ./build.sh jlink output/axfs/rootfs.axfs.bin
 
 NOTE: Your board should be up and running in u-boot first before executing this command.
@@ -235,76 +256,30 @@ FILESIZE=$(cat $dlfile | wc -c)
 
 fi
 
-
-# Run build environment setup
-if [ "$ENV_SET" != "1" ] ; then
-  # Because we are using 'source', ROOTDIR can be seen in setup_env.sh
-  source ./setup_env.sh
-fi
-
 # Create output build directory
 if [ ! -e $OUTDIR ] ; then
   mkdir -p $OUTDIR
 fi
 
-###############################################################################
-# get_toolchain
-###############################################################################
-if [ "$1" == "get_toolchain" ] ; then
-  banner_yellow "Downloading Linaro toolchain for ARM"
-
-  cd $OUTDIR
-
-  # Download toolchain
-  if [ ! -e gcc-linaro-arm-linux-gnueabihf-4.8-2014.02_linux.tar.xz ] ;then
-    wget http://releases.linaro.org/14.02/components/toolchain/binaries/gcc-linaro-arm-linux-gnueabihf-4.8-2014.02_linux.tar.xz
+##### Check if we have all the host tools we need for menuconfig #####
+if [ "$2" == "menuconfig" ] ; then
+  CHECK=$(which ncurses5-config)
+  if [ "$CHECK" == "" ] ; then
+    banner_red "ncurses is not installed"
+    echo -e "You need the package ncurses installed in order to use menuconfig."
+    echo -e "In Ubuntu, you can install it by running:\n\tsudo apt-get install ncurses-dev\n"
+    echo -e "Existing build script.\n"
+    exit
   fi
-
-  # extract toolchain
-  if [ ! -e gcc-linaro-arm-linux-gnueabihf-4.8-2014.02_linux ] ;then
-    echo "extracting toolchain..."
-    tar -xf gcc-linaro-arm-linux-gnueabihf-4.8-2014.02_linux.tar.xz
-  fi
-
-  cd $ROOTDIR
 fi
-
-##### Check if we have all the host tools we need #####
-CHECK=$(which mkimage)
-if [ "$CHECK" == "" ] ; then
-  banner_red "mkimage is not installed"
-  echo -e "You need the program mkimage installed in order to build a kernel uImage."
-  echo -e "In Ubuntu, you can install it by running:\n\tsudo apt-get install u-boot-tools\n"
-  echo -e "Existing build script.\n"
-  exit
-fi
-
-##### Check if we have all the host tools we need #####
-CHECK=$(which ncurses5-config)
-if [ "$CHECK" == "" ] ; then
-  banner_red "ncurses is not installed"
-  echo -e "You need the package ncurses installed in order to use menuconfig."
-  echo -e "In Ubuntu, you can install it by running:\n\tsudo apt-get install ncurses-dev\n"
-  echo -e "Existing build script.\n"
-  exit
-fi
-
-##### Check if toolchain is installed correctly #####
-CHECK=$(which arm-linux-gnueabihf-gcc)
-if [ "$CHECK" == "" ] ; then
-  # Toolchain not found in path...so nothing is going to work.
-  banner_red "Toolchain not installed correctly"
-  echo -e "Either run \"./build.sh get_toolchain\" first, or edit the setup_env.sh accordingly"
-  echo -e "Existing build script.\n"
-  exit
-fi
-
 
 ###############################################################################
 # build kernel
 ###############################################################################
-if [ "$1" == "kernel" ] ; then
+if [ "$1" == "kernel" ] || [ "$1" == "k" ] ; then
   banner_yellow "Building kernel"
+
+  check_for_toolchain
 
   if [ "$2" == "" ] ; then
     echo " "
@@ -314,6 +289,17 @@ if [ "$1" == "kernel" ] ; then
     echo "         XIP kernel:  ./build.sh kernel xipImage"
     echo "  Kernel config GUI:  ./build.sh kernel menuconfig"
     exit
+  fi
+
+  if [ "$2" == "uImage" ] ; then
+    CHECK=$(which mkimage)
+    if [ "$CHECK" == "" ] ; then
+      banner_red "mkimage is not installed"
+      echo -e "You need the program mkimage installed in order to build a kernel uImage."
+      echo -e "In Ubuntu, you can install it by running:\n\tsudo apt-get install u-boot-tools\n"
+      echo -e "Existing build script.\n"
+      exit
+    fi
   fi
 
   cd $OUTDIR
@@ -382,8 +368,10 @@ fi
 ###############################################################################
 # build u-boot
 ###############################################################################
-if [ "$1" == "u-boot" ] ; then
+if [ "$1" == "u-boot" ] || [ "$1" == "u" ] ; then
   banner_yellow "Building u-boot"
+
+  check_for_toolchain
 
   cd $OUTDIR
 
@@ -437,52 +425,82 @@ fi
 ###############################################################################
 # build buildroot
 ###############################################################################
-if [ "$1" == "buildroot" ] ; then
+if [ "$1" == "buildroot" ]  || [ "$1" == "b" ] ; then
   banner_yellow "Building buildroot"
 
   cd $OUTDIR
 
-  # Download buildroot-2014.05.tar.bz2
-  if [ ! -e buildroot-2014.05.tar.bz2 ] ;then
-    wget http://buildroot.uclibc.org/downloads/buildroot-2014.05.tar.bz2
+  if [ ! -e br_version.txt ] ; then
+    echo "What version of Buildroot do you want to use?"
+    echo "1. buildroot-2014.05"
+    echo "2. buildroot-2016.08"
+    echo -n "(select number)=> "
+    read ANSWER
+    if [ "$ANSWER" == "1" ] ; then
+      echo "export BR_VERSION=2014.05" > br_version.txt
+    elif [ "$ANSWER" == "2" ] ; then
+      echo "export BR_VERSION=2016.08" > br_version.txt
+    else
+      echo "ERROR: \"$ANSWER\" is an invalid selection!"
+      exit
+    fi
+    source br_version.txt
   fi
 
-  # extract buildroot-2014.05
-  if [ ! -e buildroot-2014.05/README ] ;then
+  # Download buildroot-$BR_VERSION.tar.bz2
+  if [ ! -e buildroot-$BR_VERSION.tar.bz2 ] ;then
+    wget http://buildroot.uclibc.org/downloads/buildroot-$BR_VERSION.tar.bz2
+  fi
+
+  # extract buildroot-$BR_VERSION
+  if [ ! -e buildroot-$BR_VERSION/README ] ;then
     echo "extracting buildroot..."
-    tar -xf buildroot-2014.05.tar.bz2
+    tar -xf buildroot-$BR_VERSION.tar.bz2
   fi
 
-  cd buildroot-2014.05
+  cd buildroot-$BR_VERSION
 
-  # Patch and Configure Buildroot for the RSKRZA1
-  if [ ! -e configs/rskrza1_defconfig ]; then
-    # Copy in our rootfs_overlay directory
+  if [ ! -e output ] ; then
     mkdir -p output
+  fi
+
+  # Copy in our rootfs_overlay directory
+  if [ ! -e output/rootfs_overlay ] ; then
     cp -a $ROOTDIR/patches-buildroot/rootfs_overlay output
+  fi
+
+ # Patch and Configure Buildroot for the RSKRZA1
+  if [ ! -e configs/rskrza1_defconfig ]; then
 
     # Ask the user if they want to use the glib based Linaro toolchain
     # or build a uclib toolchain from scratch.
     banner_yellow "Toolchain selection"
     #echo -e "\n\n[ Toolchain selection ]"
     echo -e "What toolchain and C Library do you want to use for building applications?"
-    echo "1) The pre-built Linareo toolchain (with glibc)"
-    echo "       - This was the toolchain you already downloaded and used to build the"
-    echo "         Linux kernel. It contains the standard gblic Libary."
-    echo "2) A uClibc based toolchain built from open source"
-    echo "       - This will use Buildroot to go out and download all the source"
-    echo "         code needed to build a full gcc/uClibc based ARM toolchain."
-    echo "         While this will create a smaller footprint file system,"
-    echo "         it will take a very long to build the first time."
+    echo ""
+    echo "By default, we suggest the Linaro pre-built toolchain with hardware float"
+    echo "support and glib C Libraries."
+    echo ""
+    echo "It is also possible to configure Buildroot to download and build from source"
+    echo "a uClibc based toolchain. Note that while uClibc produces a smaller binary"
+    echo "footprint, some open souce applications are not compatible."
+    echo ""
+    echo "Finaly, you may also configure Buildroot to use a toolchain that is already"
+    echo "install on your machine."
+    echo ""
+    echo "What would you like to do?"
+    echo "  1. Use the default Linaro toolchain (recommended)"
+    echo "  2. Install Buildroot and then let me decide in the configuration menu (advanced)"
+    echo -n "=> "
     for i in 1 2 3 ; do
       echo -n " Enter your choice (1 or 2): "
-      read ANSWER
-      if [ "$ANSWER" == "1" ] ; then break; fi
-      if [ "$ANSWER" == "2" ] ; then break; fi
+      read TC_CHOICE
+      if [ "$TC_CHOICE" == "1" ] ; then break; fi
+      if [ "$TC_CHOICE" == "2" ] ; then break; fi
       TRY=$i
     done
 
-    if [ "$TRY" == "5" ] ; then
+    if [ "$TRY" == "3" ] ; then
       echo -e "\nI give up! I have no idea what you want to do."
       exit
     fi
@@ -495,20 +513,68 @@ if [ "$1" == "buildroot" ] ; then
     #          NOTE: 'BR2_PACKAGE_JPEG=y' had to be manually added before
     #                'BR2_PACKAGE_JPEG_TURBO=y' (a bug in savedefconfig I assume)
     #
-    if [ "$ANSWER" == "1" ] ; then
-      # User wants to use and existing (downloaded) toolchain (glibc)
-      cp -a $ROOTDIR/patches-buildroot/rskrza1_defconfig configs/rskrza1_defconfig
+    cp -a $ROOTDIR/patches-buildroot/buildroot-$BR_VERSION/* configs/
 
-      # Specify the location of our toolchain (to avoid having to download it again)
-      # by changing out the default value in our rskrza1_defconfig 
-      sed -i "s%^BR2_TOOLCHAIN_EXTERNAL_PATH=.*\$%BR2_TOOLCHAIN_EXTERNAL_PATH=\"$TOOLCHAIN_DIR\"%" configs/rskrza1_defconfig
-    else
-      # User wants to build a uClibc based toolchain from scratch
-      cp -a $ROOTDIR/patches-buildroot/rskrza1_defconfig_uclibc configs/rskrza1_defconfig
+    # Many times user don't care about audio, or LCD display.
+    echo ""
+    echo "======================================================================="
+    echo ""
+    echo "Are you going to use audio or video (LCD)?"
+    echo "If you do not need audio or LCD, then we will not build those packages"
+    echo "and that will make building faster."
+    echo ""
+    echo "What type of file system do you prefer?"
+    echo ""
+    echo "1 Audio and LCD (default)"
+    echo "2 LCD only (no audio)"
+    echo "3 Minimum system (no audio/video)"
+    echo ""
+    for i in 1 2 3 ; do
+      echo -n " Enter your choice (1,2,3): "
+      read ANSWER
+      if [ "$ANSWER" == "1" ] ; then break; fi
+      if [ "$ANSWER" == "2" ] ; then break; fi
+      if [ "$ANSWER" == "3" ] ; then break; fi
+      TRY=$i
+    done
+    if [ "$TRY" == "3" ] ; then
+      echo -e "\nI give up! I have no idea what you want to do."
+      exit
     fi
 
-    # Select our RSKRZA1 config
-    make rskrza1_defconfig
+    if [ "$ANSWER" == "1" ] ; then
+      # Select our full RSKRZA1 config
+      make rskrza1_defconfig
+    fi
+
+    if [ "$ANSWER" == "2" ] ; then
+      # Select our non-audio RSKRZA1 config
+      make rskrza1_no_audio_defconfig
+    fi
+
+    if [ "$ANSWER" == "3" ] ; then
+      # Select our non-audio RSKRZA1 config
+      make rskrza1_min_defconfig
+    fi
+
+    if [ "$TC_CHOICE" == "2" ] ; then
+
+      # User wants to select the toolchain themselves.
+      make menuconfig
+      
+      echo ""
+      echo "======================================================================="
+      echo ""
+      echo " If everything is how you like it, you can now build your system by running:"
+      echo "     ./build.sh buildroot"
+      echo ""
+      echo " Or you can add additional SW packages by running:"
+      echo "     ./build.sh buildroot menuconfig"
+      echo ""
+
+      exit
+
+    fi
   fi
 
   # Build Buildroot
@@ -533,91 +599,6 @@ if [ "$1" == "buildroot" ] ; then
 
   cd $ROOTDIR
 fi
-
-###############################################################################
-# build librzjpeg
-###############################################################################
-if [ "$1" == "librzjpeg" ] ; then
-  banner_yellow "Building librzjpeg"
-
-  echo "NOTE: Because this application requries a UIO driver that statically allocates"
-  echo "1MB of RAM at boot, this JPEG HW example is not available in XIP systems at this time."
-  echo "Press enter to contiue..."
-  read dummy
-
-  cd $OUTDIR
-
-  # Requries Buildroot to be already built (because we need the libraries from
-  # jpeg-8d)
-
-  if [ ! -e $BUILDROOT_DIR/output/build/jpeg-turbo-1.3.1 ]; then
-    banner_red "Buildroot Required"
-    echo "The package jpeg-turbo-1.3.1 needs to be built first so we can link against"
-    echo "the libraries".
-    exit
-  fi
-
-  # extract buildroot-2014.05
-  if [ ! -e librzjpeg ] ;then
-    echo "extracting librzjpeg..."
-    tar -xf $ROOTDIR/librzjpeg/librzjpeg.tar.xz
-  fi
-
-  cd librzjpeg
-
-  if [ ! -e Makefile ] ; then
-
-    # Use the automake package utilites that Buildroot built already
-    # so we don't require anyone to install it system wide.
-    #autoreconf -vif
-    $BUILDROOT_DIR/output/host/usr/bin/autoreconf -vif
-
-    TOOLCHAIN=arm-linux-gnueabihf
-    PREFIX=`pwd`/_install
-
-    # Optional Debug info while running.
-    #  ADD_DEBUG=-DSHJPEG_DEBUG
-
-    ./configure --host=$TOOLCHAIN --prefix="$PREFIX" \
-	CPPFLAGS="-I$BUILDROOT_DIR/output/staging/usr/include $ADD_DEBUG" \
-	LDFLAGS="-L$BUILDROOT_DIR/output/staging/usr/lib"
-  fi
-
-  # Build librzjpeg
-  make
-
-  # Copy results to Buildroot overlay
-  mkdir -p $BUILDROOT_DIR/output/rootfs_overlay/lib
-  cp src/.libs/librzjpeg.so* $BUILDROOT_DIR/output/rootfs_overlay/lib
-  mkdir -p $BUILDROOT_DIR/output/rootfs_overlay/root/bin
-  cp tests/.libs/rzjpegtest $BUILDROOT_DIR/output/rootfs_overlay/root/bin
-
-  # Copy in startup script (that will map our /dev/uio device for us)
-  mkdir -p $BUILDROOT_DIR/output/rootfs_overlay/etc
-  cp -a $ROOTDIR/librzjpeg/etc/* $BUILDROOT_DIR/output/rootfs_overlay/etc
-
-  if [ ! -e src/.libs/librzjpeg.so ] ; then
-    # did not build, so exit
-    banner_red "librzjpeg Build failed. Exiting build script."
-    exit
-  else
-    banner_green "librzjpeg Build Successful"
-  fi
-
-  echo " "
-  banner_yellow "Please re-run buildroot to add to rootfs image"
-  echo -n "Do you want to re-run buildroot now? [y/n]: "
-  read answer
-  if [ "$answer" == "y" ];then
-    banner_yellow "Rebuilding Buildroot"
-    cd $BUILDROOT_DIR
-    make
-    banner_green "Rebuilding Buildroot Complete"
-  fi
-
-  cd $ROOTDIR
-fi
-
 
 ###############################################################################
 # build axfs
@@ -650,7 +631,7 @@ if [ "$1" == "axfs" ] ; then
   chmod a-s $BUILDROOT_DIR/output/target/bin/busybox
 
   #./mkfs.axfs -s -a $BUILDROOT_DIR/output/target rootfs.axfs.bin
-  ./mkfs.axfs -s -a ../buildroot-2014.05/output/target rootfs.axfs.bin
+  ./mkfs.axfs -s -a ../buildroot-$BR_VERSION/output/target rootfs.axfs.bin
 
   if [ ! -e rootfs.axfs.bin ] ; then
     # did not build, so exit
