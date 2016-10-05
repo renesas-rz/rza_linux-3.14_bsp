@@ -32,7 +32,7 @@ if [ -e $OUTDIR/buildroot-$BR_VERSION/output/host ] ; then
 
   # set toolchain prefix and add to path
   cd $OUTDIR/buildroot-$BR_VERSION/output/host/usr/bin
-  export CROSS_COMPILE=`ls *gcc | sed 's/gcc//'`
+  export CROSS_COMPILE=`ls *gnueabi*-gcc | sed 's/gcc//'`
   export PATH=`pwd`:$PATH
   cd -
   export ARCH=arm
