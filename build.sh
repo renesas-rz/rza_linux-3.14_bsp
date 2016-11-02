@@ -73,7 +73,7 @@ if [ "$ENV_SET" != "1" ] ; then
 fi
 
 # Find out how many CPU processor cores we have on this machine
-# so we can build faster by using multithreaded builds
+# so we can build faster by using multi-threaded builds
 NPROC=2
 if [ "$(which nproc)" != "" ] ; then  # make sure nproc is installed
   NPROC=$(nproc)
@@ -577,6 +577,92 @@ if [ "$1" == "buildroot" ]  || [ "$1" == "b" ] ; then
     fi
   fi
 
+  # Trim buildroot temporary build files since they are not longer needed
+  if [ "$2" == "trim" ] ;then
+
+    echo "This will remove a good portion of intermediate build files under"
+    echo "under the output/build directory since after they are build, they don't"
+    echo "really serve much purpose anymore."
+    echo ""
+    echo -n "Continue? [y/N] "
+    read ANS
+    if [ "$ANS" != "y" ] || [ "$ANS" == "Y" ] ; then
+      exit
+    fi
+
+    echo "First, we'll remove all the build files from output/build/host-* because once"
+    echo "they are built and copied to output/host, there is not more use for them".
+    echo "We only need to kee the .stamp_xxx files to tell Buildroot that they've already"
+    echo "been built."
+    echo -n "Press return to continue..."
+    echo TRIMMING:
+    TOTAL=`du -s -h -c $(ls -d output/build/host-*) | grep total`
+    for HOST_DIR in $(ls -d output/build/host-*)
+    do
+      du -s -h $HOST_DIR
+      find $HOST_DIR -type f ! -name '.stamp_*' -delete
+      find $HOST_DIR -type l -delete
+      rm -r -f `find $HOST_DIR -type d -name ".*"`
+      find $HOST_DIR -type d -empty -delete
+    done
+    echo ""
+    echo -n $TOTAL
+    echo " deleted"
+
+    echo ""
+    echo "Next we will look at packages that you have already built and installed in your root"
+    echo "file system. After the binaries have been copied to output/target and build libraries"
+    echo "have been copied to output/staging, there is no more use for the files under output/build."
+    echo ""
+    echo "HINT: Just pressing enter defaults to 'y' "
+    echo ""
+    for BUILD_DIR in $(ls -d output/build/*)
+    do
+      #echo $BUILD_DIR
+      #echo "${BUILD_DIR:13}"
+      BUILD_DIR_NAME=${BUILD_DIR:13:18}
+
+      # ignore the host- directories
+      if [ "${BUILD_DIR_NAME:0:5}" == "host-" ] ; then
+        continue
+      fi
+
+      # skip busybox because that is one that can be reconfigured
+      # and reinstalled even after initial built
+      if [ "${BUILD_DIR_NAME:0:7}" == "busybox" ] ; then
+        continue
+      fi
+
+      # skip toolchain
+      if [ "${BUILD_DIR_NAME:0:9}" == "toolchain" ] ; then
+        continue
+      fi
+
+      # skip skeleton
+      if [ "${BUILD_DIR_NAME:0:8}" == "skeleton" ] ; then
+        continue
+      fi
+
+      # ignore directories without stamps
+      if [ ! -e $BUILD_DIR/.stamp_target_installed ] ; then
+        continue
+      fi
+
+      echo -n "Clean $BUILD_DIR_NAME ? [ Y/n ]: "
+      read ANS
+      if [ "$ANS" == "" ] || [ "$ANS" == "y" ] || [ "$ANS" == "Y" ] ; then
+
+        du -s -h $BUILD_DIR
+        find $BUILD_DIR -type f ! -name '.stamp_*' -delete
+        find $BUILD_DIR -type l -delete
+        rm -r -f `find $BUILD_DIR -type d -name ".*"`
+        find $BUILD_DIR -type d -empty -delete
+      fi
+    done
+
+    exit
+  fi
+
   # Build Buildroot
   if [ "$2" == "" ] ;then
 
@@ -626,8 +712,8 @@ if [ "$1" == "axfs" ] ; then
 
   # NOTE: If the 's' attribute is set on busybox executable (which it is by default when
   #   Buildroot builds it), and the file owner is not 'root' (which it will not be because
-  #   you were not root when you ran Buildroot) you can't boot and will jsut keep getting
-  #   a "Permission denieded" message after the file system is mounted"
+  #   you were not root when you ran Buildroot) you can't boot and will just keep getting
+  #   a "Permission denied" message after the file system is mounted"
   chmod a-s $BUILDROOT_DIR/output/target/bin/busybox
 
   #./mkfs.axfs -s -a $BUILDROOT_DIR/output/target rootfs.axfs.bin
