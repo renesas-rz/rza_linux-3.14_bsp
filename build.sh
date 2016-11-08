@@ -304,13 +304,14 @@ if [ "$1" == "kernel" ] || [ "$1" == "k" ] ; then
 
   cd $OUTDIR
 
-  # Download linux-3.14
-  if [ ! -e linux-3.14.tar.xz ] ;then
-    wget https://www.kernel.org/pub/linux/kernel/v3.x/linux-3.14.tar.xz
-  fi
-
   # extract linux-3.14
   if [ ! -e linux-3.14 ] ;then
+
+    # Download linux-3.14
+    if [ ! -e linux-3.14.tar.xz ] ;then
+      wget https://www.kernel.org/pub/linux/kernel/v3.x/linux-3.14.tar.xz
+    fi
+
     echo "extracting kernel..."
     tar -xf linux-3.14.tar.xz
   fi
@@ -375,13 +376,14 @@ if [ "$1" == "u-boot" ] || [ "$1" == "u" ] ; then
 
   cd $OUTDIR
 
-  # Download u-boot-2015.01.tar.bz2
-  if [ ! -e u-boot-2015.01.tar.bz2 ] ;then
-    wget ftp://ftp.denx.de/pub/u-boot/u-boot-2015.01.tar.bz2
-  fi
-
   # extract u-boot-2015.01
   if [ ! -e u-boot-2015.01 ] ;then
+
+    # Download u-boot-2015.01.tar.bz2
+    if [ ! -e u-boot-2015.01.tar.bz2 ] ;then
+      wget ftp://ftp.denx.de/pub/u-boot/u-boot-2015.01.tar.bz2
+    fi
+
     echo "extracting u-boot..."
     tar -xf u-boot-2015.01.tar.bz2
   fi
