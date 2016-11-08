@@ -396,7 +396,10 @@ if [ "$1" == "u-boot" ] || [ "$1" == "u" ] ; then
     cat $ROOTDIR/patches-uboot/* > /tmp/uboot_patches.patch
     patch -p1 -i /tmp/uboot_patches.patch
 
-    # Configure u-boot
+  fi
+
+  # Configure u-boot
+  if [ ! -e .config ] ;then
     make rskrza1_config
   fi
 
