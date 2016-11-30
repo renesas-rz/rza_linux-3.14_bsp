@@ -206,13 +206,14 @@ FILESIZE=$(cat $dlfile | wc -c)
   if [ "$CHECK" != "" ] ; then
   echo "Example program operations:
 
-# Program Kernel (5MB max, Dual SPI flash)
-=> sf probe 0:1 ; sf erase 100000 280000 ; sf write $ramaddr 100000 500000
-
-# Program Kernel (X MB size, Dual SPI Flash)
-=> setenv e_sz 280000 ; setenv w_sz 500000
-=> sf probe 0:1 ; sf erase 100000 \${e_sz} ; sf write $ramaddr 100000 \${w_sz}
 "
+	if [ $FILESIZE -le $((0x500000)) ]; then	# <= 5MB?
+	  echo "# Program Kernel (5MB, Dual SPI flash)
+  => sf probe 0:1 ; sf erase 100000 280000 ; sf write $ramaddr 100000 500000"
+	elif [ $FILESIZE -le $((0x600000)) ]; then	# <= 6MB?
+	  echo "# Program Kernel (6MB, Dual SPI flash)
+  => sf probe 0:1 ; sf erase 100000 300000 ; sf write $ramaddr 100000 600000"
+	fi
   exit
   fi
 
@@ -255,6 +256,18 @@ FILESIZE=$(cat $dlfile | wc -c)
 	elif [ $FILESIZE -le $((0x1800000))  ]; then	# <= 24MB?
 	  echo "Program Rootfs (24MB)
   => sf probe 0:1 ; sf erase 00400000 C00000 ; sf write $ramaddr 00400000 1800000"
+	elif [ $FILESIZE -le $((0x1A00000))  ]; then	# <= 26MB?
+	  echo "Program Rootfs (26MB)
+  => sf probe 0:1 ; sf erase 00400000 D00000 ; sf write $ramaddr 00400000 1A00000"
+	elif [ $FILESIZE -le $((0x1C00000))  ]; then	# <= 28MB?
+	  echo "Program Rootfs (28MB)
+  => sf probe 0:1 ; sf erase 00400000 E00000 ; sf write $ramaddr 00400000 1C00000"
+	elif [ $FILESIZE -le $((0x1E00000))  ]; then	# <= 30MB?
+	  echo "Program Rootfs (30MB)
+  => sf probe 0:1 ; sf erase 00400000 F00000 ; sf write $ramaddr 00400000 1E00000"
+	elif [ $FILESIZE -le $((0x2000000))  ]; then	# <= 32MB?
+	  echo "Program Rootfs (24MB)
+  => sf probe 0:1 ; sf erase 00400000 1000000 ; sf write $ramaddr 00400000 2000000"
 	fi
   exit
   fi
