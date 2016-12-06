@@ -495,6 +495,9 @@ if [ "$1" == "buildroot" ]  || [ "$1" == "b" ] ; then
  # Patch and Configure Buildroot for the RSKRZA1
   if [ ! -e configs/rskrza1_defconfig ]; then
 
+    # Apply Buildroot patches
+    for i in $ROOTDIR/patches-buildroot/buildroot-$BR_VERSION/*.patch; do patch -p1 < $i; done
+
     # Ask the user if they want to use the glib based Linaro toolchain
     # or build a uclib toolchain from scratch.
     banner_yellow "Toolchain selection"

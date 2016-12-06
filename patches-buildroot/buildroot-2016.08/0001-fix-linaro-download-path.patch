@@ -1,0 +1,29 @@
+--- a/toolchain/toolchain-external/toolchain-external.mk	2016-09-01 05:30:19.000000000 -0400
++++ b/toolchain/toolchain-external/toolchain-external.mk	2016-12-06 10:51:14.833176714 -0500
+@@ -328,7 +328,7 @@
+ TOOLCHAIN_EXTERNAL_POST_EXTRACT_HOOKS += TOOLCHAIN_EXTERNAL_FIXUP_CMDS
+ else ifeq ($(BR2_TOOLCHAIN_EXTERNAL_LINARO_ARM),y)
+ ifeq ($(HOSTARCH),x86)
+-TOOLCHAIN_EXTERNAL_SITE = https://releases.linaro.org/14.09/components/toolchain/binaries
++TOOLCHAIN_EXTERNAL_SITE = https://releases.linaro.org/archive/14.09/components/toolchain/binaries
+ TOOLCHAIN_EXTERNAL_SOURCE = gcc-linaro-arm-linux-gnueabihf-4.9-2014.09_linux.tar.xz
+ TOOLCHAIN_EXTERNAL_ACTUAL_SOURCE_TARBALL = gcc-linaro-arm-linux-gnueabihf-4.9-2014.09_src.tar.bz2
+ TOOLCHAIN_EXTERNAL_POST_INSTALL_STAGING_HOOKS += TOOLCHAIN_EXTERNAL_LINARO_SYMLINK
+@@ -338,7 +338,7 @@
+ endif
+ else ifeq ($(BR2_TOOLCHAIN_EXTERNAL_LINARO_ARMEB),y)
+ ifeq ($(HOSTARCH),x86)
+-TOOLCHAIN_EXTERNAL_SITE = https://releases.linaro.org/14.09/components/toolchain/binaries
++TOOLCHAIN_EXTERNAL_SITE = https://releases.linaro.org/archive/14.09/components/toolchain/binaries
+ TOOLCHAIN_EXTERNAL_SOURCE = gcc-linaro-armeb-linux-gnueabihf-4.9-2014.09_linux.tar.xz
+ TOOLCHAIN_EXTERNAL_ACTUAL_SOURCE_TARBALL = gcc-linaro-armeb-linux-gnueabihf-4.9-2014.09_src.tar.bz2
+ TOOLCHAIN_EXTERNAL_POST_INSTALL_STAGING_HOOKS += TOOLCHAIN_EXTERNAL_LINARO_SYMLINK
+@@ -381,7 +381,7 @@
+ TOOLCHAIN_EXTERNAL_POST_EXTRACT_HOOKS += TOOLCHAIN_EXTERNAL_BLACKFIN_UCLIBC_EXTRA_EXTRACT
+ else ifeq ($(BR2_TOOLCHAIN_EXTERNAL_LINARO_AARCH64),y)
+ ifeq ($(HOSTARCH),x86)
+-TOOLCHAIN_EXTERNAL_SITE = https://releases.linaro.org/14.09/components/toolchain/binaries
++TOOLCHAIN_EXTERNAL_SITE = https://releases.linaro.org/archive/14.09/components/toolchain/binaries
+ TOOLCHAIN_EXTERNAL_SOURCE = gcc-linaro-aarch64-linux-gnu-4.9-2014.09_linux.tar.xz
+ TOOLCHAIN_EXTERNAL_ACTUAL_SOURCE_TARBALL = gcc-linaro-aarch64-linux-gnu-4.9-2014.09_src.tar.bz2
+ TOOLCHAIN_EXTERNAL_POST_INSTALL_STAGING_HOOKS += TOOLCHAIN_EXTERNAL_LINARO_SYMLINK

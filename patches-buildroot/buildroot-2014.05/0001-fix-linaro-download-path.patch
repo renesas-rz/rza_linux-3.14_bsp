@@ -1,0 +1,45 @@
+--- a/toolchain/toolchain-external/toolchain-external.mk	2014-05-31 03:52:49.000000000 -0400
++++ b/toolchain/toolchain-external/toolchain-external.mk	2016-12-06 10:48:54.613173264 -0500
+@@ -276,19 +276,19 @@
+ 	rm -rf $(TOOLCHAIN_EXTERNAL_INSTALL_DIR)/arago-2011.09/
+ endef
+ else ifeq ($(BR2_TOOLCHAIN_EXTERNAL_LINARO_2013_12),y)
+-TOOLCHAIN_EXTERNAL_SITE = http://releases.linaro.org/13.12/components/toolchain/binaries/
++TOOLCHAIN_EXTERNAL_SITE = http://releases.linaro.org/archive/13.12/components/toolchain/binaries/
+ TOOLCHAIN_EXTERNAL_SOURCE = gcc-linaro-arm-linux-gnueabihf-4.8-2013.12_linux.tar.xz
+ TOOLCHAIN_EXTERNAL_POST_INSTALL_STAGING_HOOKS += TOOLCHAIN_EXTERNAL_LINARO_ARMHF_SYMLINK
+ else ifeq ($(BR2_TOOLCHAIN_EXTERNAL_LINARO_2014_01),y)
+-TOOLCHAIN_EXTERNAL_SITE = http://releases.linaro.org/14.01/components/toolchain/binaries/
++TOOLCHAIN_EXTERNAL_SITE = http://releases.linaro.org/archive/14.01/components/toolchain/binaries/
+ TOOLCHAIN_EXTERNAL_SOURCE = gcc-linaro-arm-linux-gnueabihf-4.8-2014.01_linux.tar.xz
+ TOOLCHAIN_EXTERNAL_POST_INSTALL_STAGING_HOOKS += TOOLCHAIN_EXTERNAL_LINARO_ARMHF_SYMLINK
+ else ifeq ($(BR2_TOOLCHAIN_EXTERNAL_LINARO_2014_02),y)
+-TOOLCHAIN_EXTERNAL_SITE = http://releases.linaro.org/14.02/components/toolchain/binaries/
++TOOLCHAIN_EXTERNAL_SITE = http://releases.linaro.org/archive/14.02/components/toolchain/binaries/
+ TOOLCHAIN_EXTERNAL_SOURCE = gcc-linaro-arm-linux-gnueabihf-4.8-2014.02_linux.tar.xz
+ TOOLCHAIN_EXTERNAL_POST_INSTALL_STAGING_HOOKS += TOOLCHAIN_EXTERNAL_LINARO_ARMHF_SYMLINK
+ else ifeq ($(BR2_TOOLCHAIN_EXTERNAL_LINARO_ARMEB),y)
+-TOOLCHAIN_EXTERNAL_SITE = http://releases.linaro.org/14.02/components/toolchain/binaries/
++TOOLCHAIN_EXTERNAL_SITE = http://releases.linaro.org/archive/14.02/components/toolchain/binaries/
+ TOOLCHAIN_EXTERNAL_SOURCE = gcc-linaro-armeb-linux-gnueabihf-4.8-2014.02_linux.tar.xz
+ TOOLCHAIN_EXTERNAL_POST_INSTALL_STAGING_HOOKS += TOOLCHAIN_EXTERNAL_LINARO_ARMEBHF_SYMLINK
+ else ifeq ($(BR2_TOOLCHAIN_EXTERNAL_CODESOURCERY_MIPS201209),y)
+@@ -359,15 +359,15 @@
+ TOOLCHAIN_EXTERNAL_SITE = http://sources.buildroot.net/
+ TOOLCHAIN_EXTERNAL_SOURCE = microblaze-unknown-linux-gnu.tgz
+ else ifeq ($(BR2_TOOLCHAIN_EXTERNAL_LINARO_AARCH64_13_12),y)
+-TOOLCHAIN_EXTERNAL_SITE = http://releases.linaro.org/13.12/components/toolchain/binaries/
++TOOLCHAIN_EXTERNAL_SITE = http://releases.linaro.org/archive/13.12/components/toolchain/binaries/
+ TOOLCHAIN_EXTERNAL_SOURCE = gcc-linaro-aarch64-linux-gnu-4.8-2013.12-linux.tar.xz
+ TOOLCHAIN_EXTERNAL_POST_INSTALL_STAGING_HOOKS += TOOLCHAIN_EXTERNAL_LINARO_AARCH64_SYMLINK
+ else ifeq ($(BR2_TOOLCHAIN_EXTERNAL_LINARO_AARCH64_14_01),y)
+-TOOLCHAIN_EXTERNAL_SITE = http://releases.linaro.org/14.01/components/toolchain/binaries/
++TOOLCHAIN_EXTERNAL_SITE = http://releases.linaro.org/archive/14.01/components/toolchain/binaries/
+ TOOLCHAIN_EXTERNAL_SOURCE = gcc-linaro-aarch64-linux-gnu-4.8-2014.01_linux.tar.xz
+ TOOLCHAIN_EXTERNAL_POST_INSTALL_STAGING_HOOKS += TOOLCHAIN_EXTERNAL_LINARO_AARCH64_SYMLINK
+ else ifeq ($(BR2_TOOLCHAIN_EXTERNAL_LINARO_AARCH64_14_02),y)
+-TOOLCHAIN_EXTERNAL_SITE = http://releases.linaro.org/14.02/components/toolchain/binaries/
++TOOLCHAIN_EXTERNAL_SITE = http://releases.linaro.org/archive/14.02/components/toolchain/binaries/
+ TOOLCHAIN_EXTERNAL_SOURCE = gcc-linaro-aarch64-linux-gnu-4.8-2014.02_linux.tar.xz
+ TOOLCHAIN_EXTERNAL_POST_INSTALL_STAGING_HOOKS += TOOLCHAIN_EXTERNAL_LINARO_AARCH64_SYMLINK
+ else ifeq ($(BR2_TOOLCHAIN_EXTERNAL_MUSL_CROSS),y)
