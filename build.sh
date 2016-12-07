@@ -329,16 +329,36 @@ if [ "$1" == "kernel" ] || [ "$1" == "k" ] ; then
 
   cd $OUTDIR
 
-  # extract linux-3.14
+  # install linux-3.14
   if [ ! -e linux-3.14 ] ;then
 
     # Download linux-3.14
-    if [ ! -e linux-3.14.tar.xz ] ;then
-      wget https://www.kernel.org/pub/linux/kernel/v3.x/linux-3.14.tar.xz
+    #if [ ! -e linux-3.14.tar.xz ] ;then
+    #  wget https://www.kernel.org/pub/linux/kernel/v3.x/linux-3.14.tar.xz
+    #fi
+    #echo "extracting kernel..."
+    #tar -xf linux-3.14.tar.xz
+
+    CHECK=`which git`
+    if [ "CHECK" == "" ] ; then
+      banner_red "git is not installed"
+      echo -e "You need git in order to download the kernel"
+      echo -e "In Ubuntu, you can install it by running:\n\tsudo apt-get install git\n"
+      echo -e "Existing build script.\n"
+      exit
     fi
 
-    echo "extracting kernel..."
-    tar -xf linux-3.14.tar.xz
+    # clone from repository (stable release)
+    # commit 92c7aaae91bf693dd161a6754d9a30b802ec6ba7
+    #        (net: sh_eth: Check additional interrupt status bits)
+    KERNEL_COMMIT='92c7aaae91'
+    git clone -n https://github.com/renesas-rz/linux-3.14.git
+    cd linux-3.14
+    git checkout $KERNEL_COMMIT
+    cd ..
+
+      #manual download:
+      #wget https://github.com/renesas-rz/linux-3.14/archive/$KERNEL_COMMIT.zip
   fi
 
   cd linux-3.14
@@ -401,16 +421,37 @@ if [ "$1" == "u-boot" ] || [ "$1" == "u" ] ; then
 
   cd $OUTDIR
 
-  # extract u-boot-2015.01
-  if [ ! -e u-boot-2015.01 ] ;then
+  # install u-boot-2015.01
+  if [ ! -e u-boot-2015.01 ] ; then
 
     # Download u-boot-2015.01.tar.bz2
-    if [ ! -e u-boot-2015.01.tar.bz2 ] ;then
-      wget ftp://ftp.denx.de/pub/u-boot/u-boot-2015.01.tar.bz2
+    #if [ ! -e u-boot-2015.01.tar.bz2 ] ;then
+    #  wget ftp://ftp.denx.de/pub/u-boot/u-boot-2015.01.tar.bz2
+    #fi
+    #echo "extracting u-boot..."
+    #tar -xf u-boot-2015.01.tar.bz2
+
+    CHECK=`which git`
+    if [ "CHECK" == "" ] ; then
+      banner_red "git is not installed"
+      echo -e "You need git in order to download the kernel"
+      echo -e "In Ubuntu, you can install it by running:\n\tsudo apt-get install git\n"
+      echo -e "Existing build script.\n"
+      exit
     fi
 
-    echo "extracting u-boot..."
-    tar -xf u-boot-2015.01.tar.bz2
+    # clone from repository (stable release)
+    # commit 58027428ffaebbbee4a61b2ae81d3f1f3549bfd1
+    #        (grpeach: support ethernet)
+    UBOOT_COMMIT='58027428ff'
+    git clone -n https://github.com/renesas-rz/u-boot-2015.01.git
+    cd u-boot-2015.01
+    git checkout $UBOOT_COMMIT
+    cd ..
+
+      #manual download:
+      #wget https://github.com/renesas-rz/u-boot-2015.01/archive/$KERNEL_COMMIT.zip
+
   fi
 
   cd u-boot-2015.01
