@@ -111,6 +111,9 @@ Examples:
   # u-boot
   ./build.sh jlink output/u-boot-2015.01/u-boot.bin
 
+  # u-boot (program u-boot directly into QSPI flash with JLINK)
+  ./build.sh jlink output/u-boot-2015.01/u-boot.bin 0x18000000
+
   # Device Tree Blob
   ./build.sh jlink output/linux-3.14/arch/arm/boot/dts/r7s72100-rskrza1.dtb
 
@@ -181,6 +184,10 @@ NOTE: Your board should be up and running in u-boot first before executing this 
   echo "-----------------------------------------------------"
 
 FILESIZE=$(cat $dlfile | wc -c)
+
+  if [ $ramaddr == "0x18000000" ] ; then
+    exit
+  fi
 
   CHECK=$(echo $dlfile | grep u-boot)
   if [ "$CHECK" != "" ] ; then
