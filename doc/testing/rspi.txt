@@ -38,3 +38,60 @@ This matches what is in spidev_test.c file:
 	};
 
 
+----------------------------------------------------------------------------
+Attaching a SPI Flash up to RSPI-4 on the RSK board to use as an MTD device
+----------------------------------------------------------------------------
+If you attach a SPI flash to RSPI-4 on CN15 to use it as a MTD device,
+for example, in your board-rskrza1.c file you add:
+
+~~~~~~~~~~~~~~~~~~
+static struct mtd_partition rspi4_flash_partitions[] = {
+	{
+		.name		= "rspi4_data",
+		.offset		= 0x00000000,
+		.size		= SZ_8M,
+	},
+};
+static struct flash_platform_data rspi4_flash_pdata = {
+	.name	= "m25p80",
+	.parts	= rspi4_flash_partitions,
+	.nr_parts = ARRAY_SIZE(rspi4_flash_partitions),
+	.type = "s25fl512s", /* Spansion S25FL512S */
+	//.type = "m25px64", /* Numonyx M25PX64 */
+};
+
+static struct spi_board_info rskrza1_spi_devices[] __initdata = {
+#if defined(RSPI_TESTING)
+	{
+		/* SPI Flash on RSPI4 */
+		.modalias = "m25p80",
+		.max_speed_hz = 5000000,
+		.bus_num = 4,
+		.chip_select = 0,
+		.platform_data = &rspi4_flash_pdata,
+	},
+#endif
+};
+~~~~~~~~~~~~~~~~~~
+
+when the system boots, it will not be able to read the SPI flash.
+The reason is that even when "RSPI_TESTING" is defined in board-rskrza1.c,
+the signal mux on the board is not changed until function rskrza1_init_late()
+which is executed after the SPI flash is already probed (and fails).
+
+What you can do though is after the board is up, you unbind and bind the RSPI-4
+device which will essentially make it complety reinitialize just like it did on
+boot, but this time the signal mux will have already been changed and the RSPI pins
+will be connected to the CN15 connector and your SPI flash.
+
+Here's how you would unbind and then bind again:
+ $ echo -n "rspi-rz.4" > /sys/bus/platform/drivers/renesas_spi/unbind
+ $ echo -n "rspi-rz.4" > /sys/bus/platform/drivers/renesas_spi/bind
+
+After that you should see some messages saying that your SPI flash has been
+detected.
+Then you can do things like erase and mount a JFFS2 file system:
+$ flash_eraseall -j /dev/mtd1
+$ mount -t jffs2 /dev/mtdblock1 /mnt
+
+

@@ -10,10 +10,20 @@ On the RSK board, LED0 is on P7_1.
 
 	linux-3.14/arch/arm/mach-shmobile/pfc-rza1.c
 	Look at "gpio_names" to figure out 'port number' is equal to what pin.
-	For example, port number '98' is pin P7_1
+	For example, port number '113' is pin P7_1
+
+	Not all pins can be GPIO, but to make it easier to convert a GPIO
+	name into a port number, dummy enteries	were added to the table.
+
+	Therefore, "port number" = (port x 16) + bit.
+	P7_1 = (7 x 16) + 1 = 113
+	
 
 # enable the use of that pin
-echo 98 > /sys/class/gpio/export
+echo 113 > /sys/class/gpio/export
+
+# now see that a new "P7_1" interface has appeared
+ls /sys/class/gpio
 
 # set that pin as a GPIO-OUT
 echo out > /sys/class/gpio/P7_1/direction
@@ -25,24 +35,24 @@ echo 1 > /sys/class/gpio/P7_1/value
 
 
 # if you are done with the pin, you can do this to remove the interface
-echo 98 > /sys/class/gpio/unexport
+echo 113 > /sys/class/gpio/unexport
 
 
 
 # Read buttons on RZ RSK board
 
 SW1 = P1_9
-	echo 15 > /sys/class/gpio/export
+	echo 25 > /sys/class/gpio/export
 	echo in > /sys/class/gpio/P1_9/direction
 	cat /sys/class/gpio/P1_9/value
 
 SW2 = P1_8
-	echo 14 > /sys/class/gpio/export
+	echo 24 > /sys/class/gpio/export
 	echo in > /sys/class/gpio/P1_8/direction
 	cat /sys/class/gpio/P1_8/value
 
 SW3 = P1_11
-	echo 17 > /sys/class/gpio/export
+	echo 27 > /sys/class/gpio/export
 	echo in > /sys/class/gpio/P1_11/direction
 	cat /sys/class/gpio/P1_11/value
 
