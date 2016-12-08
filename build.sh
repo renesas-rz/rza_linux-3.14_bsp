@@ -389,10 +389,13 @@ if [ "$1" == "kernel" ] || [ "$1" == "k" ] ; then
   fi
 
   if [ "$IMG_BUILD" == "1" ] ; then
+    # NOTE: Adding "LOCALVERSION=" to the command line will get rid of the
+    #       plus sign (+) at the end of the kernel version string. Alternatively,
+    #       we could have created a empty ".scmversion" file in the root.
     # NOTE: We have to make the Device Tree Blobs too, so we'll add 'dtbs' to
     #       the command line
-    echo -e "make -j$BUILD_THREADS $2 dtbs\n"
-    make -j$BUILD_THREADS $2 dtbs
+    echo -e "make LOCALVERSION= -j$BUILD_THREADS $2 dtbs\n"
+    make LOCALVERSION= -j$BUILD_THREADS $2 dtbs
 
     if [ ! -e vmlinux ] ; then
       # did not build, so exit
