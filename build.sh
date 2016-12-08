@@ -373,16 +373,17 @@ if [ "$1" == "kernel" ] || [ "$1" == "k" ] ; then
 
   IMG_BUILD=0
   # Build kernel
+  XIPCHECK=`grep -s CONFIG_XIP_KERNEL=y .config`
   if [ "$2" == "uImage" ] ;then
     IMG_BUILD=1
-    if [ ! -e .config ] ; then
+    if [ ! -e .config ] || [ "$XIPCHECK" != "" ]; then
       # Need to configure kernel first
       make rskrza1_defconfig
     fi
   fi
   if [ "$2" == "xipImage" ] ;then
     IMG_BUILD=1
-    if [ ! -e .config ] ; then
+    if [ ! -e .config ] || [ "$XIPCHECK" == "" ]; then
       # Need to configure kernel first
       make rskrza1_xip_defconfig
     fi
