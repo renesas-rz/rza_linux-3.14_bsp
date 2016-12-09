@@ -349,9 +349,9 @@ if [ "$1" == "kernel" ] || [ "$1" == "k" ] ; then
     fi
 
     # clone from repository (stable release)
-    # commit 92c7aaae91bf693dd161a6754d9a30b802ec6ba7
-    #        (net: sh_eth: Check additional interrupt status bits)
-    KERNEL_COMMIT='92c7aaae91'
+    # commit f5fa66116224d50285df5a8c11c8faa3d6199f01
+    #        (rskrza1: add direct register mapping for SWRSTCR1)
+    KERNEL_COMMIT='f5fa661162'
     git clone -n https://github.com/renesas-rz/linux-3.14.git
     cd linux-3.14
     git checkout $KERNEL_COMMIT

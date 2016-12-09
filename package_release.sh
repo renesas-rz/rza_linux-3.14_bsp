@@ -1,6 +1,6 @@
 #!/bin/bash
 
-NAME=RSKRZA1-BSP-V1.2.1
+NAME=RSKRZA1-BSP-V1.3.0
 TMP=/tmp/$NAME
 
 CUR_DIR=$(pwd)
@@ -31,7 +31,6 @@ cp -a axfs $TMP
 cp -a doc $TMP
 cp -a Extra $TMP
 cp -a hello_world $TMP
-cp -a librzjpeg $TMP
 cp -a mem $TMP
 cp -a patches-buildroot $TMP
 cp -a patches-kernel $TMP
