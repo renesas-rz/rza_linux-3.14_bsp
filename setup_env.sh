@@ -19,6 +19,9 @@ fi
 # Settings
 export OUTDIR=${ROOTDIR}/output
 
+# As of GCC 4.9, you can now get a colorized output
+export GCC_COLORS='error=01;31:warning=01;35:note=01;36:caret=01;32:locus=01:quote=01'
+
 # Buildroot directory
 if [ -e $OUTDIR/br_version.txt ] ; then
   source $OUTDIR/br_version.txt
