@@ -160,7 +160,7 @@ BRD_NAMES[3]=grpeach ; BRD_DESC[3]="GR-PEACH (RZ/A1H)"
  BRD_ROOTFS[3]=0x18600000
    BRD_QSPI[3]=SINGLE
 
-BRD_NAMES[4]=ylcdrza1 ; BRD_DESC[4]="YLCDRZA1 (RZ/A1H)"
+BRD_NAMES[4]=ylcdrza1h ; BRD_DESC[4]="YLCDRZA1H (RZ/A1H)"
     BRD_CON[4]=ttySC3
   BRD_DLRAM[4]=0x08000000
   BRD_UBOOT[4]=0x18000000
@@ -1081,7 +1081,9 @@ if [ "$1" == "buildroot" ]  || [ "$1" == "b" ] ; then
   CHECK=`grep BR2_TARGET_GENERIC_GETTY_PORT=\"$CONSOLE\" $BUILDROOT_DIR/.config`
   if [ "$CHECK" == "" ] ; then
     echo "BR2_TARGET_GENERIC_GETTY_PORT=\"$CONSOLE\"" >> $BUILDROOT_DIR/.config
-    banner yellow "Warning: Your serial console setting ($CONSOLE) did not match your last build."
+    echo ""
+    echo ""
+    banner_red "Warning: Your serial console setting ($CONSOLE) did not match your last build."
     echo "Please run \"./build.sh config\" and confirm your serial console if $CONSOLE is not correct."
     echo ""
     echo "If this is the first time you are running Buildroot after selecting a new"
