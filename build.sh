@@ -5,6 +5,8 @@ function usage {
   echo -ne "\033[1;31m" # RED TEXT
   echo -e "\nWhat do you want to build?"
   echo -ne "\033[00m" # END TEXT COLOR
+  echo -e "    ./build.sh config                  : Target Board Selection ($BOARD)"
+  echo -e ""
   echo -e "    ./build.sh buildroot               : Builds Root File System (and installs toolchain)"
   echo -e "    ./build.sh u-boot                  : Builds u-boot"
   echo -e "    ./build.sh kernel                  : Builds Linux kernel. Default is to build uImage"
@@ -19,6 +21,9 @@ function usage {
   echo -e "    ./build.sh kernel rskrza1_xip_defconfig : Switch to XIP version of the kernel"
   echo -e "    ./build.sh kernel xipImage         : Build the XIP kernel image"
   echo -e "    ./build.sh buildroot menuconfig    : Open the Buildroot config GUI to select additinal apps to build"
+  echo -e ""
+  echo -e "    Current Target: $BOARD"
+  echo -e ""
 }
 
 # Function: banner_color
@@ -53,12 +58,46 @@ function check_for_toolchain {
   fi
 }
 
+# Save current config settings to file
+function save_config {
+  echo "BOARD=$BOARD" > output/config.txt
+  echo "CONSOLE=$CONSOLE" >> output/config.txt
+  echo "DLRAM_ADDR=$DLRAM_ADDR" >> output/config.txt
+  echo "UBOOT_ADDR=$UBOOT_ADDR" >> output/config.txt
+  echo "DTB_ADDR=$DTB_ADDR" >> output/config.txt
+  echo "KERNEL_ADDR=$KERNEL_ADDR" >> output/config.txt
+  echo "ROOTFS_ADDR=$ROOTFS_ADDR" >> output/config.txt
+  echo "QSPI=$QSPI" >> output/config.txt
+}
+
 ###############################################################################
 # script start
 ###############################################################################
 
 # Save current directory
 ROOTDIR=`pwd`
+
+#Defaults (for RSK)
+BOARD=rskrza1
+CONSOLE=ttySC2
+DLRAM_ADDR=0x08000000
+UBOOT_ADDR=0x18000000
+DTB_ADDR=0x180C0000
+KERNEL_ADDR=0x18200000
+ROOTFS_ADDR=0x18800000
+QSPI=DUAL
+
+# Create output build directory
+if [ ! -e output ] ; then
+  mkdir -p output
+fi
+
+# Create config.txt file, or read in current settings
+if [ ! -e output/config.txt ] ; then
+  save_config
+else
+  source output/config.txt
+fi
 
 # Check command line
 if [ "$1" == "" ] ; then
@@ -79,6 +118,249 @@ if [ "$(which nproc)" != "" ] ; then  # make sure nproc is installed
   NPROC=$(nproc)
 fi
 BUILD_THREADS=$(expr $NPROC + $NPROC)
+
+###############################################################################
+# config
+###############################################################################
+if [ "$1" == "config" ] ; then
+
+BRD_NAMES[0]=rskrza1 ; BRD_DESC[0]="RSK (RZ/A1H)"
+    BRD_CON[0]=ttySC2
+  BRD_DLRAM[0]=0x08000000
+  BRD_UBOOT[0]=0x18000000
+    BRD_DTB[0]=0x180C0000
+ BRD_KERNEL[0]=0x18200000
+ BRD_ROOTFS[0]=0x18800000
+   BRD_QSPI[0]=DUAL
+
+BRD_NAMES[1]=genmai ; BRD_DESC[1]="GENMAI (RZA1H)"
+    BRD_CON[1]=ttySC2
+  BRD_DLRAM[1]=0x08000000
+  BRD_UBOOT[1]=0x18000000
+    BRD_DTB[1]=0x180C0000
+ BRD_KERNEL[1]=0x18200000
+ BRD_ROOTFS[1]=0x18800000
+   BRD_QSPI[1]=DUAL
+
+BRD_NAMES[2]=streamit ; BRD_DESC[2]="Stream it! (RZ/A1LU)"
+    BRD_CON[2]=ttySC3
+  BRD_DLRAM[2]=0x0C000000
+  BRD_UBOOT[2]=0x18000000
+    BRD_DTB[2]=0x180C0000
+ BRD_KERNEL[2]=0x18200000
+ BRD_ROOTFS[2]=0x18800000
+   BRD_QSPI[2]=SINGLE
+
+BRD_NAMES[3]=grpeach ; BRD_DESC[3]="GR-PEACH (RZ/A1H)"
+    BRD_CON[3]=ttySC2
+  BRD_DLRAM[3]=0x20000000
+  BRD_UBOOT[3]=0x18000000
+    BRD_DTB[3]=0x180C0000
+ BRD_KERNEL[3]=0x18100000
+ BRD_ROOTFS[3]=0x18600000
+   BRD_QSPI[3]=SINGLE
+
+BRD_NAMES[4]=ylcdrza1 ; BRD_DESC[4]="YLCDRZA1 (RZ/A1H)"
+    BRD_CON[4]=ttySC3
+  BRD_DLRAM[4]=0x08000000
+  BRD_UBOOT[4]=0x18000000
+    BRD_DTB[4]=0x180C0000
+ BRD_KERNEL[4]=0x18200000
+ BRD_ROOTFS[4]=0x18800000
+   BRD_QSPI[4]=DUAL
+
+BRD_NAMES[5]=? ; BRD_DESC[5]="Custom Board"
+    BRD_CON[5]=ttySC2
+  BRD_DLRAM[5]=0x20000000
+  BRD_UBOOT[5]=0x18000000
+    BRD_DTB[5]=0x180C0000
+ BRD_KERNEL[5]=0x18200000
+ BRD_ROOTFS[5]=0x18800000
+   BRD_QSPI[5]=SINGLE
+
+BRD_CNT=$(echo ${#BRD_NAMES[@]})
+BRD_CNT_MAX_INDEX=$(expr $BRD_CNT - 1)
+
+  while [ "1" == "1" ]
+  do
+
+    CURRENT_DESC="custom"
+
+    for i in `seq 0 $BRD_CNT_MAX_INDEX` ; do
+      if [ "$BOARD" == "${BRD_NAMES[$i]}" ] ; then
+        CURRENT_DESC="${BRD_DESC[$i]}"
+        break
+      fi
+    done
+
+    whiptail --title "Build Environment Setup"  --noitem --menu "Make changes the items below as needed.\nYou may use ESC+ESC to cancel." 0 0 0 \
+	" Target Board: $BOARD [$CURRENT_DESC]" "" \
+	"      console: /dev/$CONSOLE" "" \
+	"     RAM addr: $DLRAM_ADDR" "" \
+	"  u-boot addr: $UBOOT_ADDR" "" \
+	"     DTB addr: $DTB_ADDR" "" \
+	"  kernel addr: $KERNEL_ADDR" "" \
+	"  rootfs addr: $ROOTFS_ADDR" "" \
+	"         QSPI: $QSPI" "" \
+	"Save" "" 2> /tmp/answer.txt
+
+    #ans=$(head -c 3 /tmp/answer.txt)
+    ans=$(cat /tmp/answer.txt)
+
+    if [ "$ans" == "" ]; then
+      break;
+    fi
+
+    if [ "$(grep "Target Board" /tmp/answer.txt)" != "" ] ; then
+
+    whiptail --title "Build Environment Setup" --menu \
+"Please select the platform you want to build for.\n"\
+"If you have your own custom board, choose the last\n"\
+"entry and enter the string name that you used for when\n"\
+"creating your BSP.\n"\
+"For example, if you enter \"rztoaster\", we will assume:\n"\
+" * rztoaster_defconfig (for u-boot and kernel)\n"\
+" * rztoaster_xip_defconfig (for XIP kernel)\n"\
+" * r7s72100_rztoaster.dts (for Device Tree)\n"\
+ 0 0 40 \
+	"1. ${BRD_NAMES[0]}" ":${BRD_DESC[0]}" \
+	"2. ${BRD_NAMES[1]}" ":${BRD_DESC[1]}" \
+	"3. ${BRD_NAMES[2]}" ":${BRD_DESC[2]}" \
+	"4. ${BRD_NAMES[3]}" ":${BRD_DESC[3]}" \
+	"5. ${BRD_NAMES[4]}" ":${BRD_DESC[4]}" \
+	"6. ${BRD_NAMES[5]}" ": Define your own board..." \
+ 2> /tmp/answer.txt
+    ans=$(cat /tmp/answer.txt)
+
+    # No selection (cancel)
+    if [ "$ans" == "" ] ; then
+      continue
+    fi
+
+    CUR_INDEX=$(head -c 1 /tmp/answer.txt)
+    CUR_INDEX=$(expr $CUR_INDEX - 1)
+
+    if [ "$CUR_INDEX" == "5" ] ; then
+      whiptail --title "Custom board name selection" --inputbox "Enter your board name:" 0 0 \
+      2> /tmp/answer.txt
+      # No selection (cancel)
+      if [ "$ans" == "" ] ; then
+        continue
+      fi
+      BRD_NAMES[5]=$(cat /tmp/answer.txt)
+
+      whiptail --title "Custom board selected" --msgbox "In the main menu, please adjust settings as needed" 0 0
+    fi
+
+    BOARD=${BRD_NAMES[$CUR_INDEX]}
+    CONSOLE=${BRD_CON[$CUR_INDEX]}
+    DLRAM_ADDR=${BRD_DLRAM[$CUR_INDEX]}
+    UBOOT_ADDR=${BRD_UBOOT[$CUR_INDEX]}
+    DTB_ADDR=${BRD_DTB[$CUR_INDEX]}
+    KERNEL_ADDR=${BRD_KERNEL[$CUR_INDEX]}
+    ROOTFS_ADDR=${BRD_ROOTFS[$CUR_INDEX]}
+    QSPI=${BRD_QSPI[$CUR_INDEX]}
+
+    continue
+  fi
+
+  if [ "$(grep console /tmp/answer.txt)" != "" ] ; then
+    whiptail --title "Serial Port Selection" --noitem --menu "What Serial port is your console on?" 0 0 40 \
+	"ttySC0" "" \
+	"ttySC1" "" \
+	"ttySC2" "" \
+	"ttySC3" "" \
+	"ttySC4" "" \
+	"ttySC5" "" \
+	2> /tmp/answer.txt
+      CONSOLE=$(cat /tmp/answer.txt)
+  fi
+
+  if [ "$(grep 'RAM addr' /tmp/answer.txt)" != "" ] ; then
+    whiptail --title "Address selection" --inputbox \
+"Enter the address of the RAM that you can download images to\n"\
+"using J-Link.\n"\
+"This is only needed for the './build.sh jlink' command.\n"\
+"If you only have internal RAM (no SDRAM), then you would\n"\
+"enter 0x20000000.\n"\
+"If you have external SDRAM on CS2, then you would enter 0x08000000.\n"\
+"If you have external SDRAM on CS3, then you would enter 0x0C000000.\n"\
+ 0 0 0x0C000000 \
+    2> /tmp/answer.txt
+    ans=$(cat /tmp/answer.txt)
+    # No selection (cancel)
+    if [ "$ans" == "" ] ; then
+      continue
+    fi
+    DLRAM_ADDR=$ans
+  fi
+
+  if [ "$(grep 'u-boot addr' /tmp/answer.txt)" != "" ] ; then
+    whiptail --title "Address selection" --inputbox "Enter the address of u-boot:" 0 0 0x18000000 \
+    2> /tmp/answer.txt
+    ans=$(cat /tmp/answer.txt)
+    # No selection (cancel)
+    if [ "$ans" == "" ] ; then
+      continue
+    fi
+    UBOOT_ADDR=$(cat /tmp/answer.txt)
+  fi
+
+  if [ "$(grep 'DTB addr' /tmp/answer.txt)" != "" ] ; then
+    whiptail --title "Address selection" --inputbox "Enter the address of the Device Tree Blob:" 0 0 0x180C0000 \
+    2> /tmp/answer.txt
+    ans=$(cat /tmp/answer.txt)
+    # No selection (cancel)
+    if [ "$ans" == "" ] ; then
+      continue
+    fi
+    DTB_ADDR=$ans
+  fi
+
+  if [ "$(grep 'kernel addr' /tmp/answer.txt)" != "" ] ; then
+    whiptail --title "Address selection" --inputbox "Enter the address of the Linux kernel:" 0 0 0x18200000 \
+    2> /tmp/answer.txt
+    ans=$(cat /tmp/answer.txt)
+    # No selection (cancel)
+    if [ "$ans" == "" ] ; then
+      continue
+    fi
+    KERNEL_ADDR=$ans
+  fi
+
+  if [ "$(grep 'rootfs addr' /tmp/answer.txt)" != "" ] ; then
+    whiptail --title "Address selection" --inputbox "Enter the address of the Root File System:" 0 0 0x18800000 \
+    2> /tmp/answer.txt
+    ans=$(cat /tmp/answer.txt)
+    # No selection (cancel)
+    if [ "$ans" == "" ] ; then
+      continue
+    fi
+    ROOTFS_ADDR=$ans
+  fi
+
+  if [ "$(grep QSPI /tmp/answer.txt)" != "" ] ; then
+    whiptail --title "QSPI Selection" --noitem --menu "Is your system single or dual QSPI?" 0 0 40 \
+	"SINGLE" "" \
+	"DUAL" "" \
+	2> /tmp/answer.txt
+    ans=$(cat /tmp/answer.txt)
+    # No selection (cancel)
+    if [ "$ans" == "" ] ; then
+      continue
+    fi
+    QSPI=$ans
+  fi
+
+  if [ "$(grep "Save" /tmp/answer.txt)" != "" ] ; then
+    save_config
+    break;
+  fi
+
+  done
+
+  exit
+fi
 
 ###############################################################################
 # env
@@ -105,17 +387,20 @@ if [ "$1" == "jlink" ] ; then
     echo "
 usage: ./build.sh jlink {FILE} {ADDRESS}
    FILE: The path to the file to download.
-ADDRESS: (Optional) Default is 0x08000000 (begining of SDRAM)
+ADDRESS: (Optional) Default is $DLRAM_ADDR (beginning of your RAM)
 
 Examples:
+
+  #---------------------------------------------------------------------
+  # These examples download the images to RAM, then you would use u-boot
+  # to program the images from RAM to QSPI flash
+  #---------------------------------------------------------------------
+
   # u-boot
   ./build.sh jlink output/u-boot-2015.01/u-boot.bin
 
-  # u-boot (program u-boot directly into QSPI flash with JLINK)
-  ./build.sh jlink output/u-boot-2015.01/u-boot.bin 0x18000000
-
   # Device Tree Blob
-  ./build.sh jlink output/linux-3.14/arch/arm/boot/dts/r7s72100-rskrza1.dtb
+  ./build.sh jlink output/linux-3.14/arch/arm/boot/dts/r7s72100-$BOARD.dtb
 
   # Kernel
   ./build.sh jlink output/linux-3.14/arch/arm/boot/uImage
@@ -125,11 +410,49 @@ Examples:
   ./build.sh jlink output/buildroot-$BR_VERSION/output/images/rootfs.squashfs
   ./build.sh jlink output/axfs/rootfs.axfs.bin
 
-NOTE: Your board should be up and running in u-boot first before executing this command.
+  #---------------------------------------------------------------------
+  # These examples program the image directly into QSPI using the J-LINK
+  # NOTE that the J-Link can only directly program a SINGLE SPI flash
+  #---------------------------------------------------------------------
 
+  ./build.sh jlink output/u-boot-2015.01/u-boot.bin 0x18000000
+
+  ./build.sh jlink output/linux-3.14/arch/arm/boot/dts/r7s72100-$BOARD.dtb $DTB_ADDR
 "
+  if [ "$QSPI" == "SINGLE" ] ; then
+   echo \
+"  ./build.sh jlink output/linux-3.14/arch/arm/boot/uImage $KERNEL_ADDR
+  ./build.sh jlink output/linux-3.14/arch/arm/boot/xipImage $KERNEL_ADDR
+
+  ./build.sh jlink output/buildroot-$BR_VERSION/output/images/rootfs.squashfs $ROOTFS_ADDR
+  ./build.sh jlink output/axfs/rootfs.axfs.bin $ROOTFS_ADDR
+"
+  fi
+    echo -ne "\033[1;31m" # RED TEXT
+    echo -ne "\nNOTE:"
+    echo -ne "\033[00m" # END TEXT COLOR
+    echo -e "Your board should be up and running in u-boot first\n     (ie, not Linux) before executing this command."
+
     exit
  fi
+
+  # Shortcuts for common images to program
+  # change our passed arguments to full paths
+  if [ "$2" == "uboot" ] || [ "$2" == "u-boot" ] ; then
+    set -- $1 output/u-boot-2015.01/u-boot.bin 0x18000000
+  fi
+  if [ "$2" == "dtb" ] ; then
+    set -- $1 output/linux-3.14/arch/arm/boot/dts/r7s72100-$BOARD.dtb $DTB_ADDR
+  fi
+  if [ "$2" == "uImage" ] || [ "$2" == "ku" ]; then
+    set -- $1 output/linux-3.14/arch/arm/boot/uImage $3
+  fi
+  if [ "$2" == "xipImage" ] || [ "$2" == "kx" ] ; then
+    set -- $1 output/linux-3.14/arch/arm/boot/xipImage $3
+  fi
+  if [ "$2" == "rootfs_axfs" ] || [ "$2" == "ra" ] ; then
+    set -- $1 output/axfs/rootfs.axfs.bin $3
+  fi
 
   # File check
   if [ ! -e "$2" ] ; then
@@ -151,7 +474,7 @@ NOTE: Your board should be up and running in u-boot first before executing this 
 
   ramaddr=$3
   if [ "$ramaddr" == "" ] ; then
-    ramaddr="0x08000000"
+    ramaddr=$DLRAM_ADDR
   fi
 
   # Create a jlink script and execute it
@@ -183,12 +506,18 @@ NOTE: Your board should be up and running in u-boot first before executing this 
   du -h $dlfile
   echo "-----------------------------------------------------"
 
-FILESIZE=$(cat $dlfile | wc -c)
+  FILESIZE=$(cat $dlfile | wc -c)
 
-  if [ $ramaddr == "0x18000000" ] ; then
+  if [ ${ramaddr:0:4} == "0x18" ] ; then
     exit
   fi
 
+  SF_PROBE=""
+  if [ "$QSPI" == "DUAL" ] ; then
+    SF_PROBE=":1"
+  fi
+
+  ############ u-boot Programming ############
   CHECK=$(echo $dlfile | grep u-boot)
   if [ "$CHECK" != "" ] ; then
   echo "Example program operations:
@@ -199,84 +528,72 @@ FILESIZE=$(cat $dlfile | wc -c)
   exit
   fi
 
+  ############ DTB Programming ############
   CHECK=$(echo $dlfile | grep dtb)
   if [ "$CHECK" != "" ] ; then
-  echo "Example program operations:
+    SPI_ADDR=$(printf "%x\n" $(($DTB_ADDR-0x18000000)))
+    echo "Example program operations:
 
 # Program DTB (32 KB)
-=> sf probe 0 ; sf erase C0000 40000 ; sf write $ramaddr C0000 8000
+=> sf probe 0 ; sf erase $SPI_ADDR 40000 ; sf write $ramaddr $SPI_ADDR 8000
 "
   exit
   fi
-
+  ############ Kernel Programming ############
   CHECK=$(echo $dlfile | grep Image)
   if [ "$CHECK" != "" ] ; then
-  echo "Example program operations:
+    # Determine SPI flash offset
+    SPI_ADDR=$(printf "%x\n" $(($KERNEL_ADDR-0x18000000)))
 
-"
-	if [ $FILESIZE -le $((0x500000)) ]; then	# <= 5MB?
-	  echo "# Program Kernel (5MB, Dual SPI flash)
-  => sf probe 0:1 ; sf erase 100000 280000 ; sf write $ramaddr 100000 500000"
-	elif [ $FILESIZE -le $((0x600000)) ]; then	# <= 6MB?
-	  echo "# Program Kernel (6MB, Dual SPI flash)
-  => sf probe 0:1 ; sf erase 100000 300000 ; sf write $ramaddr 100000 600000"
-	fi
-  exit
+    # Calculate how much you need to program (round up to next 1MB)
+    SPI_SZ_P=$(printf "%d\n" $(($FILESIZE/0x100000 + 1)))
+    SPI_SZ_MB=$(printf "%d\n" $(($SPI_SZ_P)))
+    SPI_SZ_P=$(printf "%x\n" $(($SPI_SZ_P*0x100000)))
+
+    echo -e "Example program operations:\n"
+
+    # Make adjustments for Dual SPI flash
+    if [ "$QSPI" == "DUAL" ] ; then
+      SPI_ADDR=$(printf "%x\n" $((0x$SPI_ADDR/2))) # SPI address is half
+      SPI_SZ_E=$(printf "%x\n" $((0x$SPI_SZ_P/2))) # Erase size is half of program size
+    else
+      SPI_SZ_E=$SPI_SZ_P
+    fi
+
+        echo "# Program Kernel (${SPI_SZ_MB}MB, $QSPI SPI flash)
+  => sf probe 0$SF_PROBE ; sf erase $SPI_ADDR $SPI_SZ_E ; sf write $ramaddr $SPI_ADDR $SPI_SZ_P"
+
+    exit
   fi
 
+  ############ Rootfs Programming ############
   CHECK=$(echo $dlfile | grep rootfs)
   if [ "$CHECK" != "" ] ; then
-  echo "Example program operations:
+    # Determine SPI flash offset
+    SPI_ADDR=$(printf "%x\n" $(($ROOTFS_ADDR-0x18000000)))
 
-"
-	# Program rootfs (Dual Flash memory)
-	if [ $FILESIZE -le $((0x400000)) ]; then	# <= 4MB?
-	  echo "Program Rootfs (4MB)
-  => sf probe 0:1 ; sf erase 00400000 200000 ; sf write $ramaddr 00400000 400000"
-	elif [ $FILESIZE -le $((0x600000)) ]; then	# <= 6MB?
-	  echo "Program Rootfs (6MB)
-  => sf probe 0:1 ; sf erase 00400000 300000 ; sf write $ramaddr 00400000 600000"
-	elif [ $FILESIZE -le $((0x800000))  ]; then	# <= 8MB?
-	  echo "Program Rootfs (8MB)
-  => sf probe 0:1 ; sf erase 00400000 400000 ; sf write $ramaddr 00400000 800000"
-	elif [ $FILESIZE -le $((0xA00000))  ]; then	# <= 10MB?
-	  echo "Program Rootfs (10MB)
-  => sf probe 0:1 ; sf erase 00400000 500000 ; sf write $ramaddr 00400000 A00000"
-	elif [ $FILESIZE -le $((0xC00000))  ]; then	# <= 12MB?
-	  echo "Program Rootfs (12MB)
-  => sf probe 0:1 ; sf erase 00400000 600000 ; sf write $ramaddr 00400000 C00000"
-	elif [ $FILESIZE -le $((0xE00000))  ]; then	# <= 14MB?
-	  echo "Program Rootfs (14MB)
-  => sf probe 0:1 ; sf erase 00400000 700000 ; sf write $ramaddr 00400000 E00000"
-	elif [ $FILESIZE -le $((0x1000000))  ]; then	# <= 16MB?
-	  echo "Program Rootfs (16MB)
-  => sf probe 0:1 ; sf erase 00400000 800000 ; sf write $ramaddr 00400000 1000000"
-	elif [ $FILESIZE -le $((0x1200000))  ]; then	# <= 18MB?
-	  echo "Program Rootfs (18MB)
-  => sf probe 0:1 ; sf erase 00400000 900000 ; sf write $ramaddr 00400000 1200000"
-	elif [ $FILESIZE -le $((0x1400000))  ]; then	# <= 20MB?
-	  echo "Program Rootfs (20MB)
-  => sf probe 0:1 ; sf erase 00400000 A00000 ; sf write $ramaddr 00400000 1400000"
-	elif [ $FILESIZE -le $((0x1600000))  ]; then	# <= 22MB?
-	  echo "Program Rootfs (22MB)
-  => sf probe 0:1 ; sf erase 00400000 B00000 ; sf write $ramaddr 00400000 1600000"
-	elif [ $FILESIZE -le $((0x1800000))  ]; then	# <= 24MB?
-	  echo "Program Rootfs (24MB)
-  => sf probe 0:1 ; sf erase 00400000 C00000 ; sf write $ramaddr 00400000 1800000"
-	elif [ $FILESIZE -le $((0x1A00000))  ]; then	# <= 26MB?
-	  echo "Program Rootfs (26MB)
-  => sf probe 0:1 ; sf erase 00400000 D00000 ; sf write $ramaddr 00400000 1A00000"
-	elif [ $FILESIZE -le $((0x1C00000))  ]; then	# <= 28MB?
-	  echo "Program Rootfs (28MB)
-  => sf probe 0:1 ; sf erase 00400000 E00000 ; sf write $ramaddr 00400000 1C00000"
-	elif [ $FILESIZE -le $((0x1E00000))  ]; then	# <= 30MB?
-	  echo "Program Rootfs (30MB)
-  => sf probe 0:1 ; sf erase 00400000 F00000 ; sf write $ramaddr 00400000 1E00000"
-	elif [ $FILESIZE -le $((0x2000000))  ]; then	# <= 32MB?
-	  echo "Program Rootfs (24MB)
-  => sf probe 0:1 ; sf erase 00400000 1000000 ; sf write $ramaddr 00400000 2000000"
-	fi
-  exit
+    # Calculate how much you need to program (round up to next 1MB)
+    SPI_SZ_P=$(printf "%d\n" $(($FILESIZE/0x100000 + 1)))
+    SPI_SZ_MB=$(printf "%d\n" $(($SPI_SZ_P)))
+    SPI_SZ_P=$(printf "%x\n" $(($SPI_SZ_P*0x100000)))
+    echo -e "Example program operations:\n"
+
+    # Make adjustments for Dual SPI flash
+    if [ "$QSPI" == "DUAL" ] ; then
+      SPI_ADDR=$(printf "%x\n" $((0x$SPI_ADDR/2))) # SPI address is half
+      SPI_SZ_E=$(printf "%x\n" $((0x$SPI_SZ_P/2))) # Erase size is half of program size
+    else
+      SPI_SZ_E=$SPI_SZ_P
+    fi
+
+        echo "# Program Rootfs (${SPI_SZ_MB}MB, $QSPI SPI flash)
+  => sf probe 0$SF_PROBE ; sf erase $SPI_ADDR $SPI_SZ_E ; sf write $ramaddr $SPI_ADDR $SPI_SZ_P"
+
+    if [ "$BOARD" == "rskrza1" ] && [ $FILESIZE -ge $((0x2000000)) ] ; then	# >= 32MB?
+      echo "Are you sure you have enough SDRAM space? The RSK only has 32MB of SDRAM."
+    fi
+    echo -e "\n"
+    exit
   fi
 
 fi
@@ -378,14 +695,26 @@ if [ "$1" == "kernel" ] || [ "$1" == "k" ] ; then
     IMG_BUILD=1
     if [ ! -e .config ] || [ "$XIPCHECK" != "" ]; then
       # Need to configure kernel first
-      make rskrza1_defconfig
+      make ${BOARD}_defconfig
+    fi
+    # re-configure kernel if we changed target board
+    CHECK=$(grep -i CONFIG_MACH_${BOARD}=y .config )
+    if [ "$CHECK" == "" ] ; then
+      echo "Reconfiguring for new board..."
+      make ${BOARD}_defconfig
     fi
   fi
   if [ "$2" == "xipImage" ] ;then
     IMG_BUILD=1
     if [ ! -e .config ] || [ "$XIPCHECK" == "" ]; then
       # Need to configure kernel first
-      make rskrza1_xip_defconfig
+      make ${BOARD}_xip_defconfig
+    fi
+    # re-configure kernel if we changed target board
+    CHECK=$(grep -i CONFIG_MACH_${BOARD}=y .config )
+    if [ "$CHECK" == "" ] ; then
+      echo "Reconfiguring for new board..."
+      make ${BOARD}_xip_defconfig
     fi
   fi
 
@@ -470,7 +799,14 @@ if [ "$1" == "u-boot" ] || [ "$1" == "u" ] ; then
 
   # Configure u-boot
   if [ ! -e .config ] ;then
-    make rskrza1_config
+    make ${BOARD}_config
+  fi
+
+  # re-configure u-boot if we changed target board
+  CHECK=$(grep CONFIG_SYS_BOARD .config | grep $BOARD)
+  if [ "$CHECK" == "" ] ; then
+    echo "Reconfiguring for new board..."
+    make ${BOARD}_config
   fi
 
   # Build u-boot
@@ -639,7 +975,7 @@ if [ "$1" == "buildroot" ]  || [ "$1" == "b" ] ; then
 
       # User wants to select the toolchain themselves.
       make menuconfig
-      
+
       echo ""
       echo "======================================================================="
       echo ""
@@ -739,6 +1075,18 @@ if [ "$1" == "buildroot" ]  || [ "$1" == "b" ] ; then
     done
 
     exit
+  fi
+
+  # Switch out the console
+  CHECK=`grep BR2_TARGET_GENERIC_GETTY_PORT=\"$CONSOLE\" $BUILDROOT_DIR/.config`
+  if [ "$CHECK" == "" ] ; then
+    echo "BR2_TARGET_GENERIC_GETTY_PORT=\"$CONSOLE\"" >> $BUILDROOT_DIR/.config
+    banner yellow "Warning: Your serial console setting ($CONSOLE) did not match your last build."
+    echo "Please run \"./build.sh config\" and confirm your serial console if $CONSOLE is not correct."
+    echo ""
+    echo "If this is the first time you are running Buildroot after selecting a new"
+    echo "target board, then you can ignore this message."
+    sleep 3
   fi
 
   # Build Buildroot
