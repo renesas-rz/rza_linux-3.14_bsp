@@ -221,7 +221,7 @@ BRD_CNT_MAX_INDEX=$(expr $BRD_CNT - 1)
 "For example, if you enter \"rztoaster\", we will assume:\n"\
 " * rztoaster_defconfig (for u-boot and kernel)\n"\
 " * rztoaster_xip_defconfig (for XIP kernel)\n"\
-" * r7s72100_rztoaster.dts (for Device Tree)\n"\
+" * r7s72100-rztoaster.dts (for Device Tree)\n"\
  0 0 40 \
 	"1. ${BRD_NAMES[0]}" ":${BRD_DESC[0]}" \
 	"2. ${BRD_NAMES[1]}" ":${BRD_DESC[1]}" \
