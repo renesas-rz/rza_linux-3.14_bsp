@@ -1152,3 +1152,61 @@ if [ "$1" == "axfs" ] ; then
   cd $ROOTDIR
 fi
 
+###############################################################################
+# update
+###############################################################################
+if [ "$1" == "update" ] ; then
+  banner_yellow "repository update"
+
+  if [ "$2" == "" ] ; then
+    echo -e "Update:"
+    echo -e "This command will 'git pull' the latest code from the github repositories."
+    echo -e "Any changes you have made will be save and re-applied after the updated."
+    echo -e "Basically, we will do the following:"
+    echo -e "  git stash      # save current changes"
+    echo -e "  git pull       # download latest version"
+    echo -e "  git stash pop  # re-apply saved changes"
+    echo -e ""
+    echo -e "  ./build.sh update b   # updates bsp build scripts"
+    echo -e "  ./build.sh update u   # updates uboot source"
+    echo -e "  ./build.sh update k   # updates kernel source "
+    echo -e ""
+    exit
+  fi
+
+  if [ "$2" == "b" ] ; then
+    git stash
+    git pull
+    git stash pop
+    exit
+  fi
+
+  if [ "$2" == "k" ] ; then
+    if [ ! -e output/linux-3.14 ] ; then
+      cd output
+      git clone https://github.com/renesas-rz/linux-3.14.git
+    else
+      cd output/linux-3.14
+      git stash
+      git checkout master    # Needed if using bsp v.1.3.0
+      git pull
+      git stash pop
+    fi
+    exit
+  fi
+
+  if [ "$2" == "u" ] ; then
+    if [ ! -e output/u-boot-2015.01 ] ; then
+      cd output
+      git clone https://github.com/renesas-rz/u-boot-2015.01.git
+    else
+      cd output/u-boot-2015.01
+      git stash
+      git checkout 2015.01-rskrza1   # Needed if using bsp v.1.3.0
+      git pull
+      git stash pop
+    fi
+    exit
+  fi
+fi
+
