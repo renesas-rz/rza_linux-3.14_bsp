@@ -1081,14 +1081,6 @@ if [ "$1" == "buildroot" ]  || [ "$1" == "b" ] ; then
   CHECK=`grep BR2_TARGET_GENERIC_GETTY_PORT=\"$CONSOLE\" $BUILDROOT_DIR/.config`
   if [ "$CHECK" == "" ] ; then
     echo "BR2_TARGET_GENERIC_GETTY_PORT=\"$CONSOLE\"" >> $BUILDROOT_DIR/.config
-    echo ""
-    echo ""
-    banner_red "Warning: Your serial console setting ($CONSOLE) did not match your last build."
-    echo "Please run \"./build.sh config\" and confirm your serial console if $CONSOLE is not correct."
-    echo ""
-    echo "If this is the first time you are running Buildroot after selecting a new"
-    echo "target board, then you can ignore this message."
-    sleep 3
   fi
 
   # Build Buildroot
