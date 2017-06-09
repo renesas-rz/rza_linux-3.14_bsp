@@ -16,7 +16,7 @@ fi
 if [ -e /sys/devices/platform/vdc5fb.0/graphics/fb0/bits_per_pixel ] ; then
     # only if the file exists
     if [ -e /root/images/renesas_logo-800x480.jpg ]; then
-      fbv -s 1 -c /root/images/renesas_logo-800x480.jpg
+      fbv -s 1 -c -f /root/images/renesas_logo-800x480.jpg
     fi
 fi
 
