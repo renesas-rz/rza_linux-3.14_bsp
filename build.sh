@@ -1080,7 +1080,7 @@ if [ "$1" == "buildroot" ]  || [ "$1" == "b" ] ; then
   # Switch out the console
   CHECK=`grep BR2_TARGET_GENERIC_GETTY_PORT=\"$CONSOLE\" $BUILDROOT_DIR/.config`
   if [ "$CHECK" == "" ] ; then
-    echo "BR2_TARGET_GENERIC_GETTY_PORT=\"$CONSOLE\"" >> $BUILDROOT_DIR/.config
+    sed -i 's/ttySC./'"$CONSOLE"'/g' $BUILDROOT_DIR/.config
   fi
 
   # Build Buildroot
