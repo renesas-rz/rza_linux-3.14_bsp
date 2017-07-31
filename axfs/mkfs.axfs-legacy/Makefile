@@ -3,6 +3,9 @@ CFLAGS = -g $(INC) -O0
 
 MKFSOBJS = mkfs.axfs.o
 
+# These packages are required for rebuilding from source
+# sudo apt-get install zlibc zlib1g zlib1g-dev
+
 all:   mkfs.axfs
 
 mkfs.axfs: $(MKFSOBJS)

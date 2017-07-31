@@ -1124,7 +1124,15 @@ if [ "$1" == "axfs" ] ; then
     #  make
 
     # Just copy the pre-build version
-    cp -a ../../axfs/mkfs.axfs-legacy/mkfs.axfs .
+    CHECK=$(uname -m)
+    if [ "$CHECK" == "x86_64" ] ; then
+      # 64-bit OS
+      cp -a ../../axfs/mkfs.axfs-legacy/mkfs.axfs.64 mkfs.axfs
+    else
+      # 32-bit OS
+      cp -a ../../axfs/mkfs.axfs-legacy/mkfs.axfs.32 mkfs.axfs
+    fi
+
     cd ..
   fi
 
