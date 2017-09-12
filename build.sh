@@ -657,7 +657,7 @@ if [ "$1" == "kernel" ] || [ "$1" == "k" ] ; then
     #tar -xf linux-3.14.tar.xz
 
     CHECK=`which git`
-    if [ "CHECK" == "" ] ; then
+    if [ "$CHECK" == "" ] ; then
       banner_red "git is not installed"
       echo -e "You need git in order to download the kernel"
       echo -e "In Ubuntu, you can install it by running:\n\tsudo apt-get install git\n"
@@ -765,7 +765,7 @@ if [ "$1" == "u-boot" ] || [ "$1" == "u" ] ; then
     #tar -xf u-boot-2015.01.tar.bz2
 
     CHECK=`which git`
-    if [ "CHECK" == "" ] ; then
+    if [ "$CHECK" == "" ] ; then
       banner_red "git is not installed"
       echo -e "You need git in order to download the kernel"
       echo -e "In Ubuntu, you can install it by running:\n\tsudo apt-get install git\n"
