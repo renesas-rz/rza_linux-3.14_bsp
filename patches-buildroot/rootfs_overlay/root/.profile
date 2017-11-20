@@ -14,8 +14,5 @@ if [ -e /dev/tty10 ] ; then
   for i in $(seq 10 1 63); do rm /dev/tty$i ; done
 fi
 
-# Set date/time
-date -s "2014-13-01 9:00:00"
-
 # Automatically run demos here by putting them here
 

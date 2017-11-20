@@ -5,6 +5,11 @@ if [ "$1" != "start" ] ; then
   exit
 fi
 
+CHECK=`date | grep "UTC 1970"`
+if [ "$CHECK" != "" ] ; then
+  # Set date/time to something other than 1970
+  date -s "2017-11-01 9:00:00"
+fi
 
 # unbind displaying console messages on the LCD (and blinking cursor)
 if [ -e /sys/class/vtconsole/vtcon1/bind ]; then
