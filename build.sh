@@ -668,14 +668,18 @@ if [ "$1" == "kernel" ] || [ "$1" == "k" ] ; then
     # clone from repository (stable release)
     # commit f5fa66116224d50285df5a8c11c8faa3d6199f01
     #        (rskrza1: add direct register mapping for SWRSTCR1)
-    KERNEL_COMMIT='f5fa661162'
-    git clone -n https://github.com/renesas-rz/linux-3.14.git
-    cd linux-3.14
-    git checkout $KERNEL_COMMIT
-    cd ..
+    #KERNEL_COMMIT='f5fa661162'
+    #git clone -n https://github.com/renesas-rz/rza_linux-3.14.git linux-3.14
+    #cd linux-3.14
+    #git checkout $KERNEL_COMMIT
+    #cd ..
 
       #manual download:
-      #wget https://github.com/renesas-rz/linux-3.14/archive/$KERNEL_COMMIT.zip
+      #wget https://github.com/renesas-rz/rza_linux-3.14/archive/$KERNEL_COMMIT.zip
+
+    # Just download the latest head of the repository
+    git clone https://github.com/renesas-rz/rza_linux-3.14.git linux-3.14
+
   fi
 
   cd linux-3.14
@@ -776,14 +780,17 @@ if [ "$1" == "u-boot" ] || [ "$1" == "u" ] ; then
     # clone from repository (stable release)
     # commit 58027428ffaebbbee4a61b2ae81d3f1f3549bfd1
     #        (grpeach: support ethernet)
-    UBOOT_COMMIT='58027428ff'
-    git clone -n https://github.com/renesas-rz/u-boot-2015.01.git
-    cd u-boot-2015.01
-    git checkout $UBOOT_COMMIT
-    cd ..
+    #UBOOT_COMMIT='58027428ff'
+    #git clone -n https://github.com/renesas-rz/rza_u-boot-2015.01.git
+    #cd u-boot-2015.01
+    #git checkout $UBOOT_COMMIT
+    #cd ..
 
       #manual download:
-      #wget https://github.com/renesas-rz/u-boot-2015.01/archive/$KERNEL_COMMIT.zip
+      #wget https://github.com/renesas-rz/rza_u-boot-2015.01/archive/$KERNEL_COMMIT.zip
+
+    # Just download the latest head of the repository
+    git clone https://github.com/renesas-rz/rza_u-boot-2015.01.git u-boot-2015.01
 
   fi
 
@@ -1192,7 +1199,7 @@ if [ "$1" == "update" ] ; then
   if [ "$2" == "k" ] ; then
     if [ ! -e output/linux-3.14 ] ; then
       cd output
-      git clone https://github.com/renesas-rz/linux-3.14.git
+      git clone https://github.com/renesas-rz/rza_linux-3.14.git linux-3.14
     else
       cd output/linux-3.14
       git stash
@@ -1206,7 +1213,7 @@ if [ "$1" == "update" ] ; then
   if [ "$2" == "u" ] ; then
     if [ ! -e output/u-boot-2015.01 ] ; then
       cd output
-      git clone https://github.com/renesas-rz/u-boot-2015.01.git
+      git clone https://github.com/renesas-rz/rza_u-boot-2015.01.git u-boot-2015.01
     else
       cd output/u-boot-2015.01
       git stash
